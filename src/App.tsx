@@ -5,11 +5,13 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import { ToastContainer } from "react-toastify";
 
 const queryClient = new QueryClient();
 function App() {
   return (
     <div>
+      <ToastContainer />
       <QueryClientProvider client={queryClient}>
         <Routes>
           <Route
