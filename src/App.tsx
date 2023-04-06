@@ -14,36 +14,40 @@ function App() {
   return (
     <div>
       <ToastContainer />
-      <QueryClientProvider client={queryClient}>
-        <Routes>
-          <Route
-            path="/"
-            element={<Home />}
-          />
-          <Route
-            path="/login"
-            element={<Login />}
-          />
-          <Route
-            path="/register"
-            element={<Register />}
-          />
-          <Route
-            path="/customer/:id"
-            element={<Customer />}
-          />
+      <div className="max-w-3xl bg-slate-200 mx-auto">
+        <div className="px-4">
+          <QueryClientProvider client={queryClient}>
+            <Routes>
+              <Route
+                path="/"
+                element={<Home />}
+              />
+              <Route
+                path="/login"
+                element={<Login />}
+              />
+              <Route
+                path="/register"
+                element={<Register />}
+              />
+              <Route
+                path="/customer/:id"
+                element={<Customer />}
+              />
 
-          <Route
-            path="/edit-customer/:id"
-            element={<EditCustomer />}
-          />
-        </Routes>
+              <Route
+                path="/edit-customer/:id"
+                element={<EditCustomer />}
+              />
+            </Routes>
 
-        <ReactQueryDevtools
-          initialIsOpen={false}
-          position="bottom-right"
-        />
-      </QueryClientProvider>
+            <ReactQueryDevtools
+              initialIsOpen={false}
+              position="bottom-right"
+            />
+          </QueryClientProvider>
+        </div>
+      </div>
     </div>
   );
 }

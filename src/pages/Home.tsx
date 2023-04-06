@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -45,6 +45,7 @@ export default function Home() {
   const [selectedLabel, setSelectedLabel] = useState<Label | null>(null);
   const [isLabelRename, setIsLabelRename] = useState(false);
   const [labelRename, setLabelRename] = useState("");
+  const [isMoveToActive, setIsMoveToActive] = useState(false);
 
   const [counter, setCounter] = useState(0);
 
@@ -184,6 +185,7 @@ export default function Home() {
         queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
       }
 
+      setIsMoveToActive(false);
       setSelectedCustomer(null);
     },
   });
@@ -215,6 +217,34 @@ export default function Home() {
     },
   });
 
+  //Move customer
+  const { data: updateCustomerResponse, mutate: updateCustomer } = useMutation<{ customer: Customer }, AxiosError, string>({
+    mutationFn: async (labelId: string) => {
+      const response = await axios.patch<{ customer: Customer }>(
+        `http://localhost:5000/api/v1/customer/${selectedCustomer?._id}`,
+        {
+          labelId: labelId,
+        },
+        { withCredentials: true }
+      );
+      const data = response.data;
+      return data;
+    },
+
+    onSuccess: (data) => {
+      const customerData = queryClient.getQueryData<Customers>(["customers", searchParams.get("label")]);
+      if (customerData) {
+        const customers = [...customerData.customers];
+        const deletedCustomers = customers.filter((customer) => {
+          return customer._id !== data.customer._id;
+        });
+        queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
+      }
+
+      setSelectedCustomer(null);
+    },
+  });
+
   const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     createLabel();
@@ -226,73 +256,149 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <div
+    <div className="py-4">
+      {/* <div
         onClick={() => {
           setCounter(counter + 1);
         }}
       >
         +
-      </div>
+      </div> */}
       {selectedCustomer ? (
-        <div className="bg-red-200">
-          <p>{selectedCustomer._id}</p>
-          <p>{selectedCustomer.name}</p>
-          <Link to={`/edit-customer/${selectedCustomer._id}`}>edit</Link>
-          <p
-            onClick={() => {
-              deleteCustomer();
-            }}
-          >
-            delete
-          </p>
-        </div>
+        <>
+          <div
+            className="fixed top-0 left-0 w-screen h-screen bg-slate-500 bg-opacity-50 flex justify-center items-center"
+            // onClick={() => {
+            //   setSelectedCustomer(null);
+            // }}
+          ></div>
+
+          <div className="bg-white max-w-3xl py -6 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col divide-y-2 min-w-[18rem] rounded-lg max-h-screen overflow-auto">
+            <div
+              className="px-4 flex justify-center py-2 cursor-pointer"
+              onClick={() => {
+                deleteCustomer();
+              }}
+            >
+              <p>Delete</p>
+            </div>
+
+            <Link
+              to={`/edit-customer/${selectedCustomer._id}`}
+              className="px-4 flex justify-center py-2"
+            >
+              Edit
+            </Link>
+
+            <div
+              className="px-4 flex justify-center py-2 cursor-pointer"
+              onClick={() => {
+                setIsMoveToActive((prev) => !prev);
+              }}
+            >
+              <p>Move to</p>
+            </div>
+
+            {isMoveToActive ? (
+              <div>
+                {labels?.labels.map((label) => {
+                  return (
+                    <div
+                      className="px-4 flex justify-center py-2 cursor-pointer"
+                      onClick={() => {
+                        updateCustomer(label._id);
+                      }}
+                      key={label._id}
+                    >
+                      {label.name}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            <div
+              className="px-4 flex justify-center py-2 cursor-pointer"
+              onClick={() => {
+                setSelectedCustomer(null);
+              }}
+            >
+              <p>Cancel</p>
+            </div>
+          </div>
+        </>
       ) : null}
+
+      {/* label prompt */}
       {selectedLabel ? (
-        <div className="bg-red-200">
-          <p>{selectedLabel._id}</p>
-          <p>{selectedLabel.name}</p>
-
-          <p
-            onClick={() => {
-              setIsLabelRename(true);
-              setLabelRename(selectedLabel.name);
-            }}
-          >
-            Rename
-          </p>
-
-          {isLabelRename ? (
-            <div>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  console.log(labelRename);
-                  updateLabel();
+        <div>
+          <div
+            className="fixed top-0 left-0 w-screen h-screen bg-slate-500 bg-opacity-50 flex justify-center items-center"
+            // onClick={() => {
+            //   setSelectedLabel(null);
+            //   setIsLabelRename(false);
+            // }}
+          ></div>
+          <div className="bg-white max-w-3xl fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col divide-y-2 min-w-[18rem] rounded-lg">
+            {isLabelRename ? (
+              <div className="px-4 flex justify-center py-2 cursor-pointer">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    console.log(labelRename);
+                    updateLabel();
+                  }}
+                  className="flex flex-col"
+                >
+                  <input
+                    type="text"
+                    value={labelRename}
+                    onChange={(e) => setLabelRename(e.target.value)}
+                    className="text-center mb-2 bg-slate-100 py-1"
+                    placeholder="Enter new label here"
+                  />
+                  <button type="submit">Save</button>
+                </form>
+              </div>
+            ) : (
+              <div
+                className="px-4 flex justify-center py-2 cursor-pointer"
+                onClick={() => {
+                  setIsLabelRename(true);
+                  // setLabelRename(selectedLabel.name);
                 }}
               >
-                <input
-                  type="text"
-                  value={labelRename}
-                  onChange={(e) => setLabelRename(e.target.value)}
-                />
-                <button type="submit">Submit</button>
-              </form>
+                <p>Rename</p>
+              </div>
+            )}
+
+            <div
+              className="px-4 flex justify-center py-2 cursor-pointer"
+              onClick={() => {
+                deleteLabel();
+              }}
+            >
+              <p>Delete</p>
             </div>
-          ) : null}
-          <p
-            onClick={() => {
-              deleteLabel();
-            }}
-          >
-            delete
-          </p>
+
+            <div
+              onClick={() => {
+                setSelectedLabel(null);
+                setIsLabelRename(false);
+              }}
+              className="px-4 flex justify-center py-2 cursor-pointer"
+            >
+              <p>Cancel</p>
+            </div>
+          </div>
         </div>
       ) : null}
+      {/* add label form */}
       <form
         onSubmit={(e) => {
           labelOnSubmitHandler(e);
         }}
+        className="mb-2 flex gap-2"
       >
         <input
           type="text"
@@ -300,20 +406,21 @@ export default function Home() {
             setLabelName(e.target.value);
           }}
           value={labelName}
+          placeholder="add new label"
         />
-        <h2>{searchParams.get("label")}</h2>
         <button type="submit">create label</button>
       </form>
 
       {/* Render label */}
-      <div>
+      <div className="flex gap-x-4 gap-y-2 overflow-auto border-b-2 flex-wrap mb-2l">
         {labels?.labels.map((label) => {
           return (
             <div
-              className="flex gap-2"
+              className={`flex gap-2 border-[1px] border-slate-300 px-4 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-300" : ""}`}
               key={label._id}
             >
               <div
+                className="cursor-pointer"
                 key={label._id}
                 onClick={() => {
                   navigate(`/?label=${label._id}`);
@@ -325,6 +432,7 @@ export default function Home() {
                 onClick={() => {
                   setSelectedLabel(label);
                 }}
+                className="cursor-pointer"
               >
                 ...
               </span>
@@ -333,11 +441,14 @@ export default function Home() {
         })}
       </div>
 
-      <div>
-        <h3 className="font-bold text-2xl">CUSTOMERS</h3>
+      {/* Render customer */}
+      <div className="flex flex-col gap-2 mb-2">
         {customers?.customers.map((customer) => {
           return (
-            <div className="flex gap-2">
+            <div
+              className="flex gap-2 bg-white px-4 rounded-md py-2"
+              key={customer._id}
+            >
               <Link
                 key={customer._id}
                 to={`/customer/${customer._id}`}
@@ -358,6 +469,7 @@ export default function Home() {
         })}
       </div>
 
+      {/* Create customer form */}
       <form
         onSubmit={(e) => {
           customerOnSubmitHandler(e);
@@ -369,6 +481,7 @@ export default function Home() {
             setCustomer({ ...customer, name: e.target.value });
           }}
           value={customer.name}
+          placeholder="create customer"
         />
         <button type="submit">create customer</button>
       </form>

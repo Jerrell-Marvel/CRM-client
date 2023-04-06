@@ -25,9 +25,15 @@ export default function Customer() {
   });
   return (
     <div>
-      <h3>{data?.customer.name}</h3>
-      <h4>{data?.customer._id}</h4>
-      <h5>{data?.customer.description}</h5>
+      <div>
+        <p>{data?.customer.name}</p>
+      </div>
+      <div>
+        <p>{data?.customer._id}</p>
+      </div>
+      <div>
+        <p>{data?.customer.description}</p>
+      </div>
     </div>
   );
 }

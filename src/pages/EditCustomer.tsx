@@ -42,6 +42,7 @@ export default function EditCustomer() {
     mutate: updateCust,
   } = useMutation<Customer["customer"]>({
     mutationFn: async () => {
+      console.log(customerData.labelId);
       const response = await axios.patch<Customer["customer"]>(
         `http://localhost:5000/api/v1/customer/${id}`,
         {
