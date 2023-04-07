@@ -194,7 +194,7 @@ export default function Home() {
     },
   });
 
-  //delete customer
+  //delete customer (err handled)
   const {
     data: deleteCustomerResponse,
     isLoading: isDeleteCustomerLoading,
@@ -255,6 +255,16 @@ export default function Home() {
 
         setIsLabelRename(false);
         setLabelRename("");
+      }
+    },
+
+    onError: (err) => {
+      if (err.request.status === 404) {
+        toast.error("Label doesn't exist");
+      } else if (err.request.status === 401) {
+        navigate("/login");
+      } else {
+        toast.error("Something went wrong please try again later");
       }
     },
   });
