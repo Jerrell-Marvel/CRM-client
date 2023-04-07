@@ -16,7 +16,7 @@ function App() {
     <div>
       <ToastContainer
         position="top-center"
-        autoClose={2000}
+        autoClose={1000}
       />
       <div className="max-w-3xl bg-slate-200 mx-auto">
         <div className="px-4">

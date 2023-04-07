@@ -144,10 +144,17 @@ export default function Home() {
     },
 
     onError: (err) => {
-      if ((err.request.status === 400 && err.response?.data.message === "Invalid label id") || err.request.status === 422) {
+      // if ((err.request.status === 400 && err.response?.data.message === "Invalid label id") || err.request.status === 422) {
+      //   toast.error("Invalid label id, please select a label");
+      // } else if (err.request.status === 400) {
+      //   toast.error("Customer name can't be empy");
+      // } else if (err.request.status === 401) {
+      //   return navigate("/login");
+      // } else {
+      //   toast.error("Something went wrong please try again later");
+      // }
+      if (err.request.status === 422) {
         toast.error("Invalid label id, please select a label");
-      } else if (err.request.status === 400) {
-        toast.error("Customer name can't be empy");
       } else if (err.request.status === 401) {
         return navigate("/login");
       } else {
@@ -232,7 +239,7 @@ export default function Home() {
     },
   });
 
-  //update label
+  //update label (err handled)
   const { data: updateLabelResponse, mutate: updateLabel } = useMutation<{ updatedLabel: Label }, AxiosError>({
     mutationFn: async () => {
       const response = await axios.patch<{ updatedLabel: Label }>(`http://localhost:5000/api/v1/label/${selectedLabel?._id}`, { name: labelRename }, { withCredentials: true });
@@ -269,13 +276,14 @@ export default function Home() {
     },
   });
 
-  //Move customer
-  const { data: updateCustomerResponse, mutate: updateCustomer } = useMutation<{ customer: Customer }, AxiosError, string>({
-    mutationFn: async (labelId: string) => {
+  //Move customer (err handled)
+  const { data: updateCustomerResponse, mutate: updateCustomer } = useMutation<{ customer: Customer }, AxiosError, { labelId: string; name: string }>({
+    mutationFn: async ({ labelId, name }) => {
       const response = await axios.patch<{ customer: Customer }>(
         `http://localhost:5000/api/v1/customer/${selectedCustomer?._id}`,
         {
           labelId: labelId,
+          name: selectedCustomer?.name,
         },
         { withCredentials: true }
       );
@@ -293,7 +301,21 @@ export default function Home() {
         queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
       }
 
+      setIsMoveToActive(false);
       setSelectedCustomer(null);
+      toast.success("Customer moved");
+    },
+
+    onError: (err) => {
+      if (err.request.status === 422) {
+        toast.error("Invalid label id, please select a label");
+      } else if (err.request.status === 404) {
+        toast.error("Customer doesn't exist");
+      } else if (err.request.status === 401) {
+        return navigate("/login");
+      } else {
+        toast.error("Something went wrong please try again later");
+      }
     },
   });
 
@@ -328,6 +350,7 @@ export default function Home() {
       >
         +
       </div> */}
+      {/* Selected customer modal */}
       {selectedCustomer ? (
         <>
           <div
@@ -363,20 +386,23 @@ export default function Home() {
               <p>Move to</p>
             </div>
 
+            {/* MOve to */}
             {isMoveToActive ? (
               <div>
                 {labels?.labels.map((label) => {
-                  return (
-                    <div
-                      className="px-4 flex justify-center py-2 cursor-pointer text-center"
-                      onClick={() => {
-                        updateCustomer(label._id);
-                      }}
-                      key={label._id}
-                    >
-                      {label.name}
-                    </div>
-                  );
+                  if (label._id !== selectedCustomer.labelId) {
+                    return (
+                      <div
+                        className="px-4 flex justify-center py-2 cursor-pointer text-center"
+                        onClick={() => {
+                          updateCustomer({ labelId: label._id, name: selectedCustomer._id });
+                        }}
+                        key={label._id}
+                      >
+                        {label.name}
+                      </div>
+                    );
+                  }
                 })}
               </div>
             ) : null}
