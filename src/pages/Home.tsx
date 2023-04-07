@@ -177,9 +177,20 @@ export default function Home() {
           return label._id !== data.deletedLabel._id;
         });
         queryClient.setQueryData<Labels>(["labels"], { labels: deletedLabels });
+        queryClient.setQueryData<Customers>(["customers", data.deletedLabel._id], { customers: [] });
       }
 
       setSelectedLabel(null);
+    },
+
+    onError: (err) => {
+      if (err.request.status === 404) {
+        toast.error("Label doesn't exist");
+      } else if (err.request.status === 401) {
+        navigate("/login");
+      } else {
+        toast.error("Something went wrong please try again later");
+      }
     },
   });
 

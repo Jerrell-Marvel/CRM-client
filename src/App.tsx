@@ -47,7 +47,7 @@ function App() {
 
             <ReactQueryDevtools
               initialIsOpen={false}
-              position="bottom-right"
+              position="bottom-left"
             />
           </QueryClientProvider>
         </div>
