@@ -85,7 +85,7 @@ export default function Home() {
     refetchOnWindowFocus: false,
   });
 
-  //create label
+  //create label (err handled)
   const {
     data: createLabelResponse,
     isLoading: isCreateLabelLoading,
@@ -119,7 +119,7 @@ export default function Home() {
     },
   });
 
-  //create customer
+  //create customer (err handled)
   const {
     data: createCustomerResponse,
     isLoading: isCreateCustomerLoading,
@@ -156,7 +156,7 @@ export default function Home() {
     },
   });
 
-  // delete label
+  // delete label (err handled)
   const {
     data: deleteLabelResponse,
     isLoading: isDeleteLabelLoading,
@@ -216,8 +216,19 @@ export default function Home() {
         queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
       }
 
-      setIsMoveToActive(false);
+      console.log("here");
       setSelectedCustomer(null);
+      setIsMoveToActive(false);
+    },
+
+    onError: (err) => {
+      if (err.request.status === 404) {
+        toast.error("Customer doesn't exist");
+      } else if (err.request.status === 401) {
+        navigate("/login");
+      } else {
+        toast.error("Something went wrong please try again later");
+      }
     },
   });
 
