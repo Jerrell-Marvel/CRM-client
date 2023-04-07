@@ -49,6 +49,7 @@ export default function Home() {
   const [isMoveToActive, setIsMoveToActive] = useState(false);
 
   const [counter, setCounter] = useState(0);
+  const [isCreateCustomerActive, setIsCreateCustomerActive] = useState(false);
 
   //get labels
   const { data: labels, isLoading: isLabelLoading } = useQuery<Labels, AxiosError>({
@@ -123,7 +124,7 @@ export default function Home() {
     data: createCustomerResponse,
     isLoading: isCreateCustomerLoading,
     mutate: createCustomer,
-  } = useMutation<{ customer: Customer }, AxiosError>({
+  } = useMutation<{ customer: Customer }, AxiosError<{ message: string; statusCode: number }>>({
     mutationFn: async () => {
       console.log({ name: customer.name, description: customer.description, labelId: searchParams.get("label") });
       const response = await axios.post<{ customer: Customer }>(`http://localhost:5000/api/v1/customer`, { name: customer.name, description: customer.description, labelId: searchParams.get("label") }, { withCredentials: true });
@@ -135,8 +136,22 @@ export default function Home() {
       const customerData = queryClient.getQueryData<Customers>(["customers", searchParams.get("label")]);
       if (customerData) {
         const customers = [...customerData.customers];
-        customers.push(data.customer);
+        customers.unshift(data.customer);
         queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: customers });
+      }
+      setIsCreateCustomerActive(false);
+      toast.success("Customer added successfully");
+    },
+
+    onError: (err) => {
+      if ((err.request.status === 400 && err.response?.data.message === "Invalid label id") || err.request.status === 422) {
+        toast.error("Invalid label id, please select a label");
+      } else if (err.request.status === 400) {
+        toast.error("Customer name can't be empy");
+      } else if (err.request.status === 401) {
+        return navigate("/login");
+      } else {
+        toast.error("Something went wrong please try again later");
       }
     },
   });
@@ -261,6 +276,14 @@ export default function Home() {
 
   const customerOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!customer.name) {
+      return toast.error("Customer name can't be empty");
+    }
+
+    // const isLabelValid = labels?.labels.filter((label) => label._id === searchParams.get("label"));
+    // if (isLabelValid?.length === 0) {
+    //   return toast.error("Invalid label id, please select the label first");
+    // }
     createCustomer();
   };
 
@@ -313,7 +336,7 @@ export default function Home() {
                 {labels?.labels.map((label) => {
                   return (
                     <div
-                      className="px-4 flex justify-center py-2 cursor-pointer"
+                      className="px-4 flex justify-center py-2 cursor-pointer text-center"
                       onClick={() => {
                         updateCustomer(label._id);
                       }}
@@ -402,6 +425,7 @@ export default function Home() {
           </div>
         </div>
       ) : null}
+
       {/* add label form */}
       <form
         onSubmit={(e) => {
@@ -450,8 +474,40 @@ export default function Home() {
         })}
       </div>
 
+      {/* Create customer form */}
+      {isCreateCustomerActive ? (
+        <form
+          onSubmit={(e) => {
+            customerOnSubmitHandler(e);
+          }}
+        >
+          <input
+            type="text"
+            onChange={(e) => {
+              setCustomer({ ...customer, name: e.target.value });
+            }}
+            value={customer.name}
+            placeholder="create customer"
+          />
+          <button type="submit">Add</button>
+          <button onClick={() => setIsCreateCustomerActive(false)}>X</button>
+        </form>
+      ) : (
+        <div
+          onClick={() => {
+            const isLabelValid = labels?.labels.filter((label) => label._id === searchParams.get("label"));
+            if (isLabelValid?.length === 0) {
+              return toast.error("Please select or create a label first");
+            }
+            setIsCreateCustomerActive(true);
+          }}
+        >
+          Create customer
+        </div>
+      )}
+
       {/* Render customer */}
-      <div className="flex flex-col gap-2 mb-2">
+      <div className="flex flex-col gap-2 my-2">
         {customers?.customers.map((customer) => {
           return (
             <div
@@ -477,23 +533,6 @@ export default function Home() {
           );
         })}
       </div>
-
-      {/* Create customer form */}
-      <form
-        onSubmit={(e) => {
-          customerOnSubmitHandler(e);
-        }}
-      >
-        <input
-          type="text"
-          onChange={(e) => {
-            setCustomer({ ...customer, name: e.target.value });
-          }}
-          value={customer.name}
-          placeholder="create customer"
-        />
-        <button type="submit">create customer</button>
-      </form>
     </div>
   );
 }
