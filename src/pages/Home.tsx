@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 type Label = {
   _id: string;
@@ -107,8 +108,12 @@ export default function Home() {
     },
 
     onError: (err) => {
-      if (err.request.status === 401) {
-        navigate("/login");
+      if (err.request.status === 400) {
+        toast.error("Label name can't be empty");
+      } else if (err.request.status === 401) {
+        return navigate("/login");
+      } else {
+        toast.error("Something went wrong please try again later");
       }
     },
   });
@@ -247,6 +252,10 @@ export default function Home() {
 
   const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!labelName) {
+      return toast.error("Label name can't be empty");
+    }
     createLabel();
   };
 
