@@ -85,7 +85,7 @@ export default function Home() {
     refetchOnWindowFocus: false,
   });
 
-  //create label (err handled)
+  //create label (err handled, success handled)
   const {
     data: createLabelResponse,
     isLoading: isCreateLabelLoading,
@@ -105,6 +105,7 @@ export default function Home() {
 
         labels.push(data.label);
         queryClient.setQueryData<Labels>("labels", { labels });
+        toast.success("Customer created");
       }
     },
 
@@ -119,7 +120,7 @@ export default function Home() {
     },
   });
 
-  //create customer (err handled)
+  //create customer (err handled, success handled)
   const {
     data: createCustomerResponse,
     isLoading: isCreateCustomerLoading,
@@ -163,7 +164,7 @@ export default function Home() {
     },
   });
 
-  // delete label (err handled)
+  // delete label (err handled, success handled)
   const {
     data: deleteLabelResponse,
     isLoading: isDeleteLabelLoading,
@@ -187,6 +188,8 @@ export default function Home() {
         queryClient.setQueryData<Customers>(["customers", data.deletedLabel._id], { customers: [] });
       }
 
+      toast.success("Label deleted successfully");
+      navigate("/");
       setSelectedLabel(null);
     },
 
@@ -201,7 +204,7 @@ export default function Home() {
     },
   });
 
-  //delete customer (err handled)
+  //delete customer (err handled, success handled)
   const {
     data: deleteCustomerResponse,
     isLoading: isDeleteCustomerLoading,
@@ -223,6 +226,8 @@ export default function Home() {
         queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
       }
 
+      toast.success("Customer deleted successfully");
+
       console.log("here");
       setSelectedCustomer(null);
       setIsMoveToActive(false);
@@ -239,7 +244,7 @@ export default function Home() {
     },
   });
 
-  //update label (err handled)
+  //update label (err handled, success handled)
   const { data: updateLabelResponse, mutate: updateLabel } = useMutation<{ updatedLabel: Label }, AxiosError>({
     mutationFn: async () => {
       const response = await axios.patch<{ updatedLabel: Label }>(`http://localhost:5000/api/v1/label/${selectedLabel?._id}`, { name: labelRename }, { withCredentials: true });
@@ -260,6 +265,7 @@ export default function Home() {
 
         queryClient.setQueryData<Labels>(["labels"], { labels: tempLabels });
 
+        toast.success("Label updated successfully");
         setIsLabelRename(false);
         setLabelRename("");
       }
@@ -276,7 +282,7 @@ export default function Home() {
     },
   });
 
-  //Move customer (err handled)
+  //Move customer (err handled, success handled)
   const { data: updateCustomerResponse, mutate: updateCustomer } = useMutation<{ customer: Customer }, AxiosError, { labelId: string; name: string }>({
     mutationFn: async ({ labelId, name }) => {
       const response = await axios.patch<{ customer: Customer }>(
@@ -503,11 +509,11 @@ export default function Home() {
       </form>
 
       {/* Render label */}
-      <div className="flex gap-x-4 gap-y-2 overflow-auto border-b-2 flex-wrap mb-2l">
+      <div className="flex gap-x-4 gap-y-2 overflow-auto border-b-2 mb-2l">
         {labels?.labels.map((label) => {
           return (
             <div
-              className={`flex gap-2 border-[1px] border-slate-300 px-4 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-300" : ""}`}
+              className={`flex h-fit whitespace-nowrap gap-2 border-[1px] border-slate-300 px-4 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-300" : ""}`}
               key={label._id}
             >
               <div
