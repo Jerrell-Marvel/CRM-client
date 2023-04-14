@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import useGetLabel from "../hooks/label/useGetLabel";
+import useGetCustomer from "../hooks/customer/useGetCustomer";
+import useCreateLabel from "../hooks/label/useCreateLabel";
+import useCreateCustomer from "../hooks/customer/useCreateCustomer";
 
 type Label = {
   _id: string;
@@ -34,6 +38,12 @@ type CreateCustomerResponse = {
   labelId: string;
 };
 
+type CustomerDataParam = {
+  name: string;
+  description: string;
+  labelId: string | null;
+};
+
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [labelName, setLabelName] = useState("");
@@ -51,118 +61,17 @@ export default function Home() {
   const [counter, setCounter] = useState(0);
   const [isCreateCustomerActive, setIsCreateCustomerActive] = useState(false);
 
-  //get labels
-  const { data: labels, isLoading: isLabelLoading } = useQuery<Labels, AxiosError>({
-    queryKey: ["labels"],
-    queryFn: async () => {
-      const response = await axios.get<Labels>("http://localhost:5000/api/v1/label", { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
-    onError: (err) => {
-      if (err.request.status === 401) {
-        navigate("/login");
-      }
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  //get labels (Custom hooks)
+  const { data: labels, isLoading: isLabelLoading } = useGetLabel();
 
-  //get customer
-  const { data: customers, isLoading: isCustomerLoading } = useQuery<Customers, AxiosError>({
-    queryKey: ["customers", searchParams.get("label")],
-    queryFn: async () => {
-      const response = await axios.get<Customers>(`http://localhost:5000/api/v1/customer?label=${searchParams.get("label")}`, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
-    onError: (err) => {
-      if (err.request.status === 401) {
-        navigate("/login");
-      }
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  //get customer (Custom hooks)
+  const { data: customers, isLoading: isCustomerLoading } = useGetCustomer(searchParams.get("label"));
 
-  //create label (err handled, success handled)
-  const {
-    data: createLabelResponse,
-    isLoading: isCreateLabelLoading,
-    mutate: createLabel,
-  } = useMutation<{ label: Label }, AxiosError>({
-    mutationFn: async () => {
-      const response = await axios.post<{ label: Label }>(`http://localhost:5000/api/v1/label`, { name: labelName }, { withCredentials: true });
-      const data = response.data;
-      console.log(data);
-      return data;
-    },
+  //create label (err handled, success handled) (Custom hooks)
+  const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
 
-    onSuccess: (data) => {
-      const labelData = queryClient.getQueryData<Labels>("labels");
-      if (labelData) {
-        const labels = [...labelData?.labels];
-
-        labels.push(data.label);
-        queryClient.setQueryData<Labels>("labels", { labels });
-        toast.success("Customer created");
-      }
-    },
-
-    onError: (err) => {
-      if (err.request.status === 400) {
-        toast.error("Label name can't be empty");
-      } else if (err.request.status === 401) {
-        return navigate("/login");
-      } else {
-        toast.error("Something went wrong please try again later");
-      }
-    },
-  });
-
-  //create customer (err handled, success handled)
-  const {
-    data: createCustomerResponse,
-    isLoading: isCreateCustomerLoading,
-    mutate: createCustomer,
-  } = useMutation<{ customer: Customer }, AxiosError<{ message: string; statusCode: number }>>({
-    mutationFn: async () => {
-      console.log({ name: customer.name, description: customer.description, labelId: searchParams.get("label") });
-      const response = await axios.post<{ customer: Customer }>(`http://localhost:5000/api/v1/customer`, { name: customer.name, description: customer.description, labelId: searchParams.get("label") }, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
-
-    onSuccess: (data) => {
-      const customerData = queryClient.getQueryData<Customers>(["customers", searchParams.get("label")]);
-      if (customerData) {
-        const customers = [...customerData.customers];
-        customers.unshift(data.customer);
-        queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: customers });
-      }
-      setIsCreateCustomerActive(false);
-      toast.success("Customer added successfully");
-    },
-
-    onError: (err) => {
-      // if ((err.request.status === 400 && err.response?.data.message === "Invalid label id") || err.request.status === 422) {
-      //   toast.error("Invalid label id, please select a label");
-      // } else if (err.request.status === 400) {
-      //   toast.error("Customer name can't be empy");
-      // } else if (err.request.status === 401) {
-      //   return navigate("/login");
-      // } else {
-      //   toast.error("Something went wrong please try again later");
-      // }
-      if (err.request.status === 422) {
-        toast.error("Invalid label id, please select a label");
-      } else if (err.request.status === 401) {
-        return navigate("/login");
-      } else {
-        toast.error("Something went wrong please try again later");
-      }
-    },
-  });
+  //create customer (err handled, success handled) (custom hooks)
+  const { data: createCustomerResponse, isLoading: isCreateCustomerLoading, mutate: createCustomer } = useCreateCustomer(setIsCreateCustomerActive);
 
   // delete label (err handled, success handled)
   const {
@@ -325,16 +234,16 @@ export default function Home() {
     },
   });
 
-  const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, labelName: string) => {
     e.preventDefault();
 
     if (!labelName) {
       return toast.error("Label name can't be empty");
     }
-    createLabel();
+    createLabel(labelName);
   };
 
-  const customerOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const customerOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, custData: CustomerDataParam) => {
     e.preventDefault();
     if (!customer.name) {
       return toast.error("Customer name can't be empty");
@@ -344,7 +253,7 @@ export default function Home() {
     // if (isLabelValid?.length === 0) {
     //   return toast.error("Invalid label id, please select the label first");
     // }
-    createCustomer();
+    createCustomer(custData);
   };
 
   return (
@@ -493,7 +402,7 @@ export default function Home() {
       {/* add label form */}
       <form
         onSubmit={(e) => {
-          labelOnSubmitHandler(e);
+          labelOnSubmitHandler(e, labelName);
         }}
         className="mb-2 flex gap-2"
       >
@@ -542,7 +451,7 @@ export default function Home() {
       {isCreateCustomerActive ? (
         <form
           onSubmit={(e) => {
-            customerOnSubmitHandler(e);
+            customerOnSubmitHandler(e, { name: customer.name, description: customer.description, labelId: searchParams.get("label") });
           }}
         >
           <input
