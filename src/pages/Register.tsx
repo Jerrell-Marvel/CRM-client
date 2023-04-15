@@ -1,6 +1,7 @@
 import { useMutation } from "react-query";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 type UserData = {
   username: string;
@@ -29,6 +30,17 @@ export default function Register() {
   };
 
   const onSubmitHandler = () => {
+    if (!userData.username) {
+      return toast.error("Username field can't be empty");
+    }
+    if (!userData.email) {
+      return toast.error("Email field can't be empty");
+    }
+
+    if (!userData.password) {
+      return toast.error("Password field can't be empty");
+    }
+
     register();
   };
   return (
