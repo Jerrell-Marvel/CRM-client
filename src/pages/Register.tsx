@@ -1,7 +1,8 @@
 import { useMutation } from "react-query";
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 
 type UserData = {
   username: string;
@@ -9,16 +10,30 @@ type UserData = {
   password: string;
 };
 export default function Register() {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState<UserData>({ username: "", email: "", password: "" });
   const {
     data: registerResponse,
     isLoading,
     mutate: register,
-  } = useMutation({
+  } = useMutation<any, AxiosError>({
     mutationFn: async () => {
       const response = await axios.post("http://localhost:5000/api/v1/register", { ...userData });
       const data = response.data;
       return data;
+    },
+
+    onSuccess: () => {
+      toast.success("Account created");
+      navigate("/login");
+    },
+
+    onError: (err) => {
+      if (err.response!.status === 409) {
+        toast.error("Email is already registered");
+      } else {
+        toast.error("Something went wrong please try again later");
+      }
     },
   });
 
