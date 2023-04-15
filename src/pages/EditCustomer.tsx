@@ -2,6 +2,8 @@ import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useParams } from "react-router";
+import useUpdateCustomer from "../hooks/customer/useUpdateCustomer";
+import useGetCustomer from "../hooks/customer/useGetCustomer";
 
 type Customer = {
   customer: {
@@ -11,6 +13,11 @@ type Customer = {
     createdBy: string;
     labelId: string;
   };
+};
+
+type CustomerState = {
+  name: string;
+  description: string;
 };
 
 export default function EditCustomer() {
@@ -23,41 +30,30 @@ export default function EditCustomer() {
     createdBy: "",
     labelId: "",
   });
-  const { data, isLoading } = useQuery<Customer, AxiosError>({
-    queryKey: ["customer", id],
-    queryFn: async () => {
-      const response = await axios.get<Customer>(`http://localhost:5000/api/v1/customer/${id}`, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
+  // const { data, isLoading } = useQuery<Customer, AxiosError>({
+  //   queryKey: ["customer", id],
+  //   queryFn: async () => {
+  //     const response = await axios.get<Customer>(`http://localhost:5000/api/v1/customer/${id}`, { withCredentials: true });
+  //     const data = response.data;
+  //     return data;
+  //   },
 
-    onSuccess: (data) => {
-      setCustomerData(data.customer);
+  //   onSuccess: (data) => {
+  //     setCustomerData(data.customer);
+  //   },
+  // });
+
+  const { data, isLoading } = useGetCustomer({
+    customerId: id,
+    config: {
+      onSuccess: (data) => {
+        console.log(data);
+        setCustomerData(data.customer);
+      },
     },
   });
 
-  const {
-    data: updateCustData,
-    isLoading: isUpdateCustLoading,
-    mutate: updateCust,
-  } = useMutation<Customer["customer"]>({
-    mutationFn: async () => {
-      console.log(customerData.labelId);
-      const response = await axios.patch<Customer["customer"]>(
-        `http://localhost:5000/api/v1/customer/${id}`,
-        {
-          name: customerData.name,
-          description: customerData.description,
-          labelId: customerData.labelId,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-      const data = response.data;
-      return data;
-    },
-  });
+  const { data: updateCustData, isLoading: isUpdateCustLoading, mutate: updateCustomer } = useUpdateCustomer();
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCustomerData({
@@ -70,7 +66,14 @@ export default function EditCustomer() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          updateCust();
+          updateCustomer({
+            customerId: customerData._id,
+            prevLabelId: customerData.labelId,
+            customerData: {
+              name: customerData.name,
+              description: customerData.description,
+            },
+          });
         }}
       >
         <input

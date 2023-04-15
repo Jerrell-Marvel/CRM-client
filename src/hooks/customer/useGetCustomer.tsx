@@ -1,40 +1,35 @@
 import axios, { AxiosError } from "axios";
-import { useEffect, useState } from "react";
-import { UseQueryResult, useQuery } from "react-query";
-import { useNavigate } from "react-router";
+import { UseQueryOptions, useQuery } from "react-query";
 
 type Customer = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: string;
-  labelId: string;
+  customer: {
+    _id: string;
+    name: string;
+    description: string;
+    createdBy: string;
+    labelId: string;
+  };
 };
 
 type Customers = {
   customers: Customer[];
 };
 
-const useGetCustomer = (labelId: string | null) => {
-  const navigate = useNavigate();
+type UseGetCustomerParams = {
+  customerId: string | null | undefined;
+  config?: UseQueryOptions<Customer, AxiosError>;
+};
 
-  return useQuery<Customers, AxiosError>({
-    queryKey: ["customers", labelId],
+const useGetCustomer = ({ customerId, config }: UseGetCustomerParams) => {
+  return useQuery<Customer, AxiosError>({
+    queryKey: ["customer", customerId],
     queryFn: async () => {
-      if (!labelId) {
-        return { customers: [] };
-      }
-      const response = await axios.get<Customers>(`http://localhost:5000/api/v1/customer?label=${labelId}`, { withCredentials: true });
+      const response = await axios.get<Customer>(`http://localhost:5000/api/v1/customer/${customerId}`, { withCredentials: true });
       const data = response.data;
       return data;
     },
-    onError: (err) => {
-      if (err.request.status === 401) {
-        navigate("/login");
-      }
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
+
+    ...config,
   });
 };
 

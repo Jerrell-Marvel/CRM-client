@@ -4,9 +4,13 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query"
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import useGetLabel from "../hooks/label/useGetLabel";
-import useGetCustomer from "../hooks/customer/useGetCustomer";
+import useGetCustomer from "../hooks/customer/useGetCustomers";
 import useCreateLabel from "../hooks/label/useCreateLabel";
 import useCreateCustomer from "../hooks/customer/useCreateCustomer";
+import useDeleteLabel from "../hooks/label/useDeleteLabel";
+import useDeleteCustomer from "../hooks/customer/useDeleteCustomer";
+import useUpdateLabel from "../hooks/label/useUpdateLabel";
+import useUpdateCustomer from "../hooks/customer/useUpdateCustomer";
 
 type Label = {
   _id: string;
@@ -65,7 +69,7 @@ export default function Home() {
   const { data: labels, isLoading: isLabelLoading } = useGetLabel();
 
   //get customer (Custom hooks)
-  const { data: customers, isLoading: isCustomerLoading } = useGetCustomer(searchParams.get("label"));
+  const { data: customers, isLoading: isCustomerLoading } = useGetCustomer({ labelId: searchParams.get("label") });
 
   //create label (err handled, success handled) (Custom hooks)
   const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
@@ -73,166 +77,17 @@ export default function Home() {
   //create customer (err handled, success handled) (custom hooks)
   const { data: createCustomerResponse, isLoading: isCreateCustomerLoading, mutate: createCustomer } = useCreateCustomer(setIsCreateCustomerActive);
 
-  // delete label (err handled, success handled)
-  const {
-    data: deleteLabelResponse,
-    isLoading: isDeleteLabelLoading,
-    mutate: deleteLabel,
-  } = useMutation<{ deletedLabel: Label }, AxiosError>({
-    mutationFn: async () => {
-      const response = await axios.delete<{ deletedLabel: Label }>(`http://localhost:5000/api/v1/label/${selectedLabel?._id}`, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
+  // delete label (err handled, success handled) (custom hooks)
+  const { data: deleteLabelResponse, isLoading: isDeleteLabelLoading, mutate: deleteLabel } = useDeleteLabel(setSelectedLabel);
 
-    onSuccess: (data) => {
-      const labelsData = queryClient.getQueryData<Labels>(["labels"]);
-      console.log(labelsData);
-      if (labelsData) {
-        const labels = [...labelsData.labels];
-        const deletedLabels = labels.filter((label) => {
-          return label._id !== data.deletedLabel._id;
-        });
-        queryClient.setQueryData<Labels>(["labels"], { labels: deletedLabels });
-        queryClient.setQueryData<Customers>(["customers", data.deletedLabel._id], { customers: [] });
-      }
+  //delete customer (err handled, success handled) (custom hooks)
+  const { data: deleteCustomerResponse, isLoading: isDeleteCustomerLoading, mutate: deleteCustomer } = useDeleteCustomer({ setSelectedCustomer, setIsMoveToActive });
 
-      toast.success("Label deleted successfully");
-      navigate("/");
-      setSelectedLabel(null);
-    },
+  //update label (err handled, success handled) (custom hooks)
+  const { data: updateLabelResponse, mutate: updateLabel } = useUpdateLabel({ setIsLabelRename, setLabelRename });
 
-    onError: (err) => {
-      if (err.request.status === 404) {
-        toast.error("Label doesn't exist");
-      } else if (err.request.status === 401) {
-        navigate("/login");
-      } else {
-        toast.error("Something went wrong please try again later");
-      }
-    },
-  });
-
-  //delete customer (err handled, success handled)
-  const {
-    data: deleteCustomerResponse,
-    isLoading: isDeleteCustomerLoading,
-    mutate: deleteCustomer,
-  } = useMutation<{ deletedCustomer: Customer }, AxiosError>({
-    mutationFn: async () => {
-      const response = await axios.delete<{ deletedCustomer: Customer }>(`http://localhost:5000/api/v1/customer/${selectedCustomer?._id}`, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
-
-    onSuccess: (data) => {
-      const customerData = queryClient.getQueryData<Customers>(["customers", searchParams.get("label")]);
-      if (customerData) {
-        const customers = [...customerData.customers];
-        const deletedCustomers = customers.filter((customer) => {
-          return customer._id !== data.deletedCustomer._id;
-        });
-        queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
-      }
-
-      toast.success("Customer deleted successfully");
-
-      console.log("here");
-      setSelectedCustomer(null);
-      setIsMoveToActive(false);
-    },
-
-    onError: (err) => {
-      if (err.request.status === 404) {
-        toast.error("Customer doesn't exist");
-      } else if (err.request.status === 401) {
-        navigate("/login");
-      } else {
-        toast.error("Something went wrong please try again later");
-      }
-    },
-  });
-
-  //update label (err handled, success handled)
-  const { data: updateLabelResponse, mutate: updateLabel } = useMutation<{ updatedLabel: Label }, AxiosError>({
-    mutationFn: async () => {
-      const response = await axios.patch<{ updatedLabel: Label }>(`http://localhost:5000/api/v1/label/${selectedLabel?._id}`, { name: labelRename }, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
-
-    onSuccess: (data) => {
-      const labels = queryClient.getQueryData<Labels>(["labels"]);
-
-      if (labels) {
-        const updateLabelIdx = labels.labels.findIndex((label) => {
-          return data.updatedLabel._id === label._id;
-        });
-
-        const tempLabels = [...labels.labels];
-        tempLabels[updateLabelIdx] = data.updatedLabel;
-
-        queryClient.setQueryData<Labels>(["labels"], { labels: tempLabels });
-
-        toast.success("Label updated successfully");
-        setIsLabelRename(false);
-        setLabelRename("");
-      }
-    },
-
-    onError: (err) => {
-      if (err.request.status === 404) {
-        toast.error("Label doesn't exist");
-      } else if (err.request.status === 401) {
-        navigate("/login");
-      } else {
-        toast.error("Something went wrong please try again later");
-      }
-    },
-  });
-
-  //Move customer (err handled, success handled)
-  const { data: updateCustomerResponse, mutate: updateCustomer } = useMutation<{ customer: Customer }, AxiosError, { labelId: string; name: string }>({
-    mutationFn: async ({ labelId, name }) => {
-      const response = await axios.patch<{ customer: Customer }>(
-        `http://localhost:5000/api/v1/customer/${selectedCustomer?._id}`,
-        {
-          labelId: labelId,
-          name: selectedCustomer?.name,
-        },
-        { withCredentials: true }
-      );
-      const data = response.data;
-      return data;
-    },
-
-    onSuccess: (data) => {
-      const customerData = queryClient.getQueryData<Customers>(["customers", searchParams.get("label")]);
-      if (customerData) {
-        const customers = [...customerData.customers];
-        const deletedCustomers = customers.filter((customer) => {
-          return customer._id !== data.customer._id;
-        });
-        queryClient.setQueryData<Customers>(["customers", searchParams.get("label")], { customers: deletedCustomers });
-      }
-
-      setIsMoveToActive(false);
-      setSelectedCustomer(null);
-      toast.success("Customer moved");
-    },
-
-    onError: (err) => {
-      if (err.request.status === 422) {
-        toast.error("Invalid label id, please select a label");
-      } else if (err.request.status === 404) {
-        toast.error("Customer doesn't exist");
-      } else if (err.request.status === 401) {
-        return navigate("/login");
-      } else {
-        toast.error("Something went wrong please try again later");
-      }
-    },
-  });
+  //update customer (err handled, success handled) (custom hooks)
+  const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({ setIsMoveToActive, setSelectedCustomer });
 
   const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, labelName: string) => {
     e.preventDefault();
@@ -279,7 +134,7 @@ export default function Home() {
             <div
               className="px-4 flex justify-center py-2 cursor-pointer"
               onClick={() => {
-                deleteCustomer();
+                deleteCustomer(selectedCustomer._id);
               }}
             >
               <p>Delete</p>
@@ -310,7 +165,7 @@ export default function Home() {
                       <div
                         className="px-4 flex justify-center py-2 cursor-pointer text-center"
                         onClick={() => {
-                          updateCustomer({ labelId: label._id, name: selectedCustomer._id });
+                          updateCustomer({ customerId: selectedCustomer._id, prevLabelId: selectedCustomer.labelId, customerData: { name: selectedCustomer.name, labelId: label._id } });
                         }}
                         key={label._id}
                       >
@@ -318,6 +173,8 @@ export default function Home() {
                       </div>
                     );
                   }
+
+                  return null;
                 })}
               </div>
             ) : null}
@@ -351,7 +208,7 @@ export default function Home() {
                   onSubmit={(e) => {
                     e.preventDefault();
                     console.log(labelRename);
-                    updateLabel();
+                    updateLabel({ labelId: selectedLabel._id, labelName: labelRename });
                   }}
                   className="flex flex-col"
                 >
@@ -380,7 +237,7 @@ export default function Home() {
             <div
               className="px-4 flex justify-center py-2 cursor-pointer"
               onClick={() => {
-                deleteLabel();
+                deleteLabel(selectedLabel._id);
               }}
             >
               <p>Delete</p>

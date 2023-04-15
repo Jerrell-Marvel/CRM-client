@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { useQuery } from "react-query";
 import { useParams } from "react-router";
+import useGetCustomer from "../hooks/customer/useGetCustomer";
 
 type Customer = {
   customer: {
@@ -13,16 +14,9 @@ type Customer = {
 };
 
 export default function Customer() {
-  const { id } = useParams();
+  const { id: customerId } = useParams();
 
-  const { data, isLoading } = useQuery<Customer, AxiosError>({
-    queryKey: ["customer", id],
-    queryFn: async () => {
-      const response = await axios.get<Customer>(`http://localhost:5000/api/v1/customer/${id}`, { withCredentials: true });
-      const data = response.data;
-      return data;
-    },
-  });
+  const { data, isLoading } = useGetCustomer({ customerId });
   return (
     <div>
       <div>
