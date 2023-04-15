@@ -2,20 +2,9 @@ import axios, { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { Customer, Customers } from "../../types/customer";
 
-type Customer = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: string;
-  labelId: string;
-};
-
-type Customers = {
-  customers: Customer[];
-};
-
-type CustomerDataParam = {
+type MutationFnParam = {
   name: string;
   description: string;
   labelId: string | null;
@@ -25,7 +14,7 @@ const useCreateCustomer = (setIsCreateCustomerActive: React.Dispatch<React.SetSt
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  return useMutation<{ customer: Customer }, AxiosError, CustomerDataParam>({
+  return useMutation<{ customer: Customer }, AxiosError, MutationFnParam>({
     mutationFn: async ({ name, description, labelId }) => {
       console.log({ name, description, labelId });
       const response = await axios.post<{ customer: Customer }>(`http://localhost:5000/api/v1/customer`, { name, description, labelId }, { withCredentials: true });

@@ -1,19 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { UseQueryOptions, useQuery } from "react-query";
-
-type Customer = {
-  customer: {
-    _id: string;
-    name: string;
-    description: string;
-    createdBy: string;
-    labelId: string;
-  };
-};
-
-type Customers = {
-  customers: Customer[];
-};
+import { Customer } from "../../types/customer";
 
 type UseGetCustomerParams = {
   customerId: string | null | undefined;
@@ -24,8 +11,8 @@ const useGetCustomer = ({ customerId, config }: UseGetCustomerParams) => {
   return useQuery<Customer, AxiosError>({
     queryKey: ["customer", customerId],
     queryFn: async () => {
-      const response = await axios.get<Customer>(`http://localhost:5000/api/v1/customer/${customerId}`, { withCredentials: true });
-      const data = response.data;
+      const response = await axios.get<{ customer: Customer }>(`http://localhost:5000/api/v1/customer/${customerId}`, { withCredentials: true });
+      const data = response.data.customer;
       return data;
     },
 

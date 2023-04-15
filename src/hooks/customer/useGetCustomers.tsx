@@ -2,24 +2,13 @@ import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { UseQueryResult, useQuery } from "react-query";
 import { useNavigate } from "react-router";
+import { Customers } from "../../types/customer";
 
-type Customer = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: string;
-  labelId: string;
-};
-
-type Customers = {
-  customers: Customer[];
-};
-
-type UseGetCustomerParams = {
+type UseGetCustomerParam = {
   labelId: string | null;
 };
 
-const useGetCustomers = ({ labelId }: UseGetCustomerParams) => {
+const useGetCustomers = ({ labelId }: UseGetCustomerParam) => {
   const navigate = useNavigate();
 
   return useQuery<Customers, AxiosError>({

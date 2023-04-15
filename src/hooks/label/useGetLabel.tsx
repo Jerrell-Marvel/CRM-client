@@ -1,14 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router";
-type Label = {
-  _id: string;
-  name: string;
-  createdBy: string;
-};
-type Labels = {
-  labels: Label[];
-};
+import { Label, Labels } from "../../types/label";
 
 const useGetLabel = () => {
   const navigate = useNavigate();

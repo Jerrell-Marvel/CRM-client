@@ -2,20 +2,9 @@ import axios, { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Customer, Customers } from "../../types/customer";
 
-type Customer = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: string;
-  labelId: string;
-};
-
-type Customers = {
-  customers: Customer[];
-};
-
-type MutationFnParams = {
+type MutationFnParam = {
   customerId: string;
   prevLabelId: string;
   customerData: {
@@ -35,7 +24,7 @@ const useUpdateCustomer = ({ setIsMoveToActive, setSelectedCustomer }: UseUpdate
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  return useMutation<{ customer: Customer }, AxiosError<{ message: string }>, MutationFnParams>({
+  return useMutation<{ customer: Customer }, AxiosError<{ message: string }>, MutationFnParam>({
     mutationFn: async ({ customerId, prevLabelId, customerData }) => {
       const response = await axios.patch<{ customer: Customer }>(
         `http://localhost:5000/api/v1/customer/${customerId}`,

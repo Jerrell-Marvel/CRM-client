@@ -2,23 +2,14 @@ import axios, { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-
-type Label = {
-  _id: string;
-  name: string;
-  createdBy: string;
-};
-
-type Labels = {
-  labels: Label[];
-};
+import { Label, Labels } from "../../types/label";
 
 type UseUpdateLabelParams = {
   setIsLabelRename: React.Dispatch<React.SetStateAction<boolean>>;
   setLabelRename: React.Dispatch<React.SetStateAction<string>>;
 };
 
-type MutationFnParams = {
+type MutationFnParam = {
   labelId: string;
   labelName: string;
 };
@@ -27,7 +18,7 @@ const useUpdateLabel = ({ setIsLabelRename, setLabelRename }: UseUpdateLabelPara
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  return useMutation<{ updatedLabel: Label }, AxiosError, MutationFnParams>({
+  return useMutation<{ updatedLabel: Label }, AxiosError, MutationFnParam>({
     mutationFn: async ({ labelId, labelName }) => {
       const response = await axios.patch<{ updatedLabel: Label }>(`http://localhost:5000/api/v1/label/${labelId}`, { name: labelName }, { withCredentials: true });
       const data = response.data;

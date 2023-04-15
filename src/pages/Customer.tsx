@@ -20,13 +20,13 @@ export default function Customer() {
   return (
     <div>
       <div>
-        <p>{data?.customer.name}</p>
+        <p>{data?.name}</p>
       </div>
       <div>
-        <p>{data?.customer._id}</p>
+        <p>{data?._id}</p>
       </div>
       <div>
-        <p>{data?.customer.description}</p>
+        <p>{data?.description}</p>
       </div>
     </div>
   );

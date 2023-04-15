@@ -48,7 +48,7 @@ export default function EditCustomer() {
     config: {
       onSuccess: (data) => {
         console.log(data);
-        setCustomerData(data.customer);
+        setCustomerData(data);
       },
     },
   });

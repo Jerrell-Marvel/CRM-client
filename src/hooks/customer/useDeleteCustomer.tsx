@@ -2,18 +2,7 @@ import axios, { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-
-type Customer = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: string;
-  labelId: string;
-};
-
-type Customers = {
-  customers: Customer[];
-};
+import { Customer, Customers } from "../../types/customer";
 
 type UseDeleteCustomerParams = {
   setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;

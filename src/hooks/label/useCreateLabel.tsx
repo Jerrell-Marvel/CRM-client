@@ -2,16 +2,7 @@ import axios, { AxiosError } from "axios";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-
-type Label = {
-  _id: string;
-  name: string;
-  createdBy: string;
-};
-
-type Labels = {
-  labels: Label[];
-};
+import { Label, Labels } from "../../types/label";
 
 const useCreateLabel = () => {
   const queryClient = useQueryClient();
