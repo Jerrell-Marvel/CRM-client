@@ -28,13 +28,12 @@ export default function Register() {
     });
   };
 
-  const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmitHandler = () => {
     register();
   };
   return (
-    <div>
-      <form onSubmit={(e) => onSubmitHandler(e)}>
+    <div className="min-h-screen flex justify-center items-center">
+      {/* <form onSubmit={(e) => onSubmitHandler()}>
         <input
           type="text"
           placeholder="username"
@@ -63,6 +62,61 @@ export default function Register() {
           value={userData.password}
         />
         <input type="submit" />
+      </form> */}
+
+      <form
+        className="mx-auto w-full rounded-lg bg-white p-8 shadow-xl max-w-lg"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmitHandler();
+        }}
+      >
+        <div className="flex flex-col gap-6">
+          <h2 className="text-center text-4xl font-semibold">Register to Jerrell Store</h2>
+          <div>
+            <input
+              type="text"
+              required
+              name="username"
+              placeholder="username"
+              className="w-full rounded-lg border-2 p-3"
+              value={userData.username}
+              onChange={(e) => {
+                onChangeHandler(e);
+              }}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <input
+              type="text"
+              required
+              name="email"
+              placeholder="email"
+              className={`rounded-lg border-2 w-full p-3`}
+              value={userData.email}
+              onChange={(e) => {
+                onChangeHandler(e);
+              }}
+            />
+          </div>
+
+          <div>
+            <input
+              type="password"
+              name="password"
+              className="w-full rounded-lg border-2 p-3"
+              placeholder="password"
+              value={userData.password}
+              required
+              onChange={(e) => {
+                onChangeHandler(e);
+              }}
+            />
+          </div>
+
+          <button className="flex h-14 w-full items-center justify-center border-2 border-black bg-black uppercase text-white transition-colors duration-300">register</button>
+        </div>
       </form>
     </div>
   );
