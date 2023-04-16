@@ -53,7 +53,7 @@ export default function EditCustomer() {
     },
   });
 
-  const { data: updateCustData, isLoading: isUpdateCustLoading, mutate: updateCustomer } = useUpdateCustomer();
+  const { data: updateCustData, isLoading: isUpdateCustLoading, mutate: updateCustomer } = useUpdateCustomer({});
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCustomerData({

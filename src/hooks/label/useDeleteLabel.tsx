@@ -5,7 +5,11 @@ import { toast } from "react-toastify";
 import { Label, Labels } from "../../types/label";
 import { Customer, Customers } from "../../types/customer";
 
-const useDeleteLabel = (setSelectedLabel: React.Dispatch<React.SetStateAction<Label | null>>) => {
+type UseDeleteLabelParam = {
+  onSuccess: () => void;
+};
+
+const useDeleteLabel = ({ onSuccess }: UseDeleteLabelParam) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -29,8 +33,10 @@ const useDeleteLabel = (setSelectedLabel: React.Dispatch<React.SetStateAction<La
       }
 
       toast.success("Label deleted successfully");
-      navigate("/");
-      setSelectedLabel(null);
+      // navigate("/");
+
+      onSuccess();
+      // setSelectedLabel(null);
     },
 
     onError: (err) => {

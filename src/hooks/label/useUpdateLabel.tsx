@@ -5,8 +5,10 @@ import { toast } from "react-toastify";
 import { Label, Labels } from "../../types/label";
 
 type UseUpdateLabelParams = {
-  setIsLabelRename: React.Dispatch<React.SetStateAction<boolean>>;
-  setLabelRename: React.Dispatch<React.SetStateAction<string>>;
+  // setIsLabelRename: React.Dispatch<React.SetStateAction<boolean>>;
+  // setLabelRename: React.Dispatch<React.SetStateAction<string>>;
+
+  onSuccess: () => void;
 };
 
 type MutationFnParam = {
@@ -14,7 +16,7 @@ type MutationFnParam = {
   labelName: string;
 };
 
-const useUpdateLabel = ({ setIsLabelRename, setLabelRename }: UseUpdateLabelParams) => {
+const useUpdateLabel = ({ onSuccess }: UseUpdateLabelParams) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -39,8 +41,10 @@ const useUpdateLabel = ({ setIsLabelRename, setLabelRename }: UseUpdateLabelPara
         queryClient.setQueryData<Labels>(["labels"], { labels: tempLabels });
 
         toast.success("Label updated successfully");
-        setIsLabelRename(false);
-        setLabelRename("");
+
+        onSuccess();
+        // setIsLabelRename(false);
+        // setLabelRename("");
       }
     },
 

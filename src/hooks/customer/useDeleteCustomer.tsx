@@ -5,11 +5,12 @@ import { toast } from "react-toastify";
 import { Customer, Customers } from "../../types/customer";
 
 type UseDeleteCustomerParams = {
-  setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
-  setIsMoveToActive: React.Dispatch<React.SetStateAction<boolean>>;
+  // setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
+  // setIsMoveToActive: React.Dispatch<React.SetStateAction<boolean>>;
+  onSuccess: () => void;
 };
 
-const useDeleteCustomer = ({ setSelectedCustomer, setIsMoveToActive }: UseDeleteCustomerParams) => {
+const useDeleteCustomer = ({ onSuccess }: UseDeleteCustomerParams) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -32,8 +33,9 @@ const useDeleteCustomer = ({ setSelectedCustomer, setIsMoveToActive }: UseDelete
 
       toast.success("Customer deleted successfully");
 
-      setSelectedCustomer(null);
-      setIsMoveToActive(false);
+      onSuccess();
+      // setSelectedCustomer(null);
+      // setIsMoveToActive(false);
     },
 
     onError: (err) => {

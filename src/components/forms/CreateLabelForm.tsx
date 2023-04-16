@@ -10,7 +10,7 @@ const CreateLabelForm = () => {
     isLoading: isCreateLabelLoading,
     mutate: createLabel,
   } = useCreateLabel({
-    successCb: () => {
+    onSuccess: () => {
       setLabelName("");
     },
   });

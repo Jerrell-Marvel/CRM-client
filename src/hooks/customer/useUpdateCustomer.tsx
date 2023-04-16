@@ -15,11 +15,12 @@ type MutationFnParam = {
 };
 
 type UseUpdateCustomerParams = {
-  setIsMoveToActive?: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedCustomer?: React.Dispatch<React.SetStateAction<Customer | null>>;
+  // setIsMoveToActive?: React.Dispatch<React.SetStateAction<boolean>>;
+  // setSelectedCustomer?: React.Dispatch<React.SetStateAction<Customer | null>>;
+  onSuccess?: () => void;
 };
 
-const useUpdateCustomer = ({ setIsMoveToActive, setSelectedCustomer }: UseUpdateCustomerParams = {}) => {
+const useUpdateCustomer = ({ onSuccess }: UseUpdateCustomerParams) => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -50,13 +51,17 @@ const useUpdateCustomer = ({ setIsMoveToActive, setSelectedCustomer }: UseUpdate
         }
       }
 
-      if (setIsMoveToActive) {
-        setIsMoveToActive(false);
+      // if (setIsMoveToActive) {
+      //   setIsMoveToActive(false);
+      // }
+
+      // if (setSelectedCustomer) {
+      //   setSelectedCustomer(null);
+      // }
+      if (onSuccess) {
+        onSuccess();
       }
 
-      if (setSelectedCustomer) {
-        setSelectedCustomer(null);
-      }
       toast.success("Updated successfully");
     },
 

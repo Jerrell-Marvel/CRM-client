@@ -10,8 +10,21 @@ type LabelModalProps = {
 const LabelModal = ({ selectedLabel, setSelectedLabel }: LabelModalProps) => {
   const [isLabelRename, setIsLabelRename] = useState(false);
   const [labelRename, setLabelRename] = useState("");
-  const { data: updateLabelResponse, mutate: updateLabel } = useUpdateLabel({ setIsLabelRename, setLabelRename });
-  const { data: deleteLabelResponse, isLoading: isDeleteLabelLoading, mutate: deleteLabel } = useDeleteLabel(setSelectedLabel);
+  const { data: updateLabelResponse, mutate: updateLabel } = useUpdateLabel({
+    onSuccess: () => {
+      setIsLabelRename(false);
+      setLabelRename("");
+    },
+  });
+  const {
+    data: deleteLabelResponse,
+    isLoading: isDeleteLabelLoading,
+    mutate: deleteLabel,
+  } = useDeleteLabel({
+    onSuccess: () => {
+      setSelectedLabel(null);
+    },
+  });
 
   return (
     <>

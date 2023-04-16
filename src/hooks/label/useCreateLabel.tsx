@@ -5,10 +5,10 @@ import { toast } from "react-toastify";
 import { Label, Labels } from "../../types/label";
 
 type UseCreateLabel = {
-  successCb: () => void;
+  onSuccess: () => void;
 };
 
-const useCreateLabel = ({ successCb }: UseCreateLabel) => {
+const useCreateLabel = ({ onSuccess }: UseCreateLabel) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -27,10 +27,10 @@ const useCreateLabel = ({ successCb }: UseCreateLabel) => {
 
         labels.push(data.label);
         queryClient.setQueryData<Labels>("labels", { labels });
-        toast.success("Customer created");
+        toast.success("Label created");
       }
 
-      successCb();
+      onSuccess();
     },
 
     onError: (err) => {

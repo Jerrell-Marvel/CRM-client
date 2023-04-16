@@ -12,8 +12,23 @@ type CustomerModalProps = {
 };
 const CustomerModal = ({ selectedCustomer, setSelectedCustomer, labels }: CustomerModalProps) => {
   const [isMoveToActive, setIsMoveToActive] = useState(false);
-  const { data: deleteCustomerResponse, isLoading: isDeleteCustomerLoading, mutate: deleteCustomer } = useDeleteCustomer({ setSelectedCustomer, setIsMoveToActive });
-  const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({ setIsMoveToActive, setSelectedCustomer });
+  const {
+    data: deleteCustomerResponse,
+    isLoading: isDeleteCustomerLoading,
+    mutate: deleteCustomer,
+  } = useDeleteCustomer({
+    onSuccess: () => {
+      setSelectedCustomer(null);
+      setIsMoveToActive(false);
+    },
+  });
+
+  const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({
+    onSuccess: () => {
+      setSelectedCustomer(null);
+      setIsMoveToActive(false);
+    },
+  });
   return (
     <>
       {selectedCustomer ? (

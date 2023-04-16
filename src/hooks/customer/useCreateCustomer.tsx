@@ -11,10 +11,10 @@ type MutationFnParam = {
 };
 
 type UseCreateCustomerParam = {
-  successCb: () => void;
+  onSuccess: () => void;
 };
 
-const useCreateCustomer = ({ successCb }: UseCreateCustomerParam) => {
+const useCreateCustomer = ({ onSuccess }: UseCreateCustomerParam) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -35,7 +35,7 @@ const useCreateCustomer = ({ successCb }: UseCreateCustomerParam) => {
       }
 
       toast.success("Customer added successfully");
-      successCb();
+      onSuccess();
     },
 
     onError: (err) => {

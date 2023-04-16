@@ -24,8 +24,9 @@ const CreateCustomerForm = ({ labels }: CreateCustomerFormParam) => {
     isLoading: isCreateCustomerLoading,
     mutate: createCustomer,
   } = useCreateCustomer({
-    successCb: () => {
+    onSuccess: () => {
       setIsCreateCustomerActive(false);
+      setCustomer({ name: "", description: "" });
     },
   });
 
