@@ -12,6 +12,7 @@ import useDeleteCustomer from "../hooks/customer/useDeleteCustomer";
 import useUpdateLabel from "../hooks/label/useUpdateLabel";
 import useUpdateCustomer from "../hooks/customer/useUpdateCustomer";
 import CustomerModal from "../components/modals/CustomerModal";
+import LabelModal from "../components/modals/LabelModal";
 
 type Label = {
   _id: string;
@@ -78,17 +79,17 @@ export default function Home() {
   //create customer (err handled, success handled) (custom hooks)
   const { data: createCustomerResponse, isLoading: isCreateCustomerLoading, mutate: createCustomer } = useCreateCustomer(setIsCreateCustomerActive);
 
-  // delete label (err handled, success handled) (custom hooks)
-  const { data: deleteLabelResponse, isLoading: isDeleteLabelLoading, mutate: deleteLabel } = useDeleteLabel(setSelectedLabel);
+  // delete label (err handled, success handled) (custom hooks, moved to LabelModal component)
+  // const { data: deleteLabelResponse, isLoading: isDeleteLabelLoading, mutate: deleteLabel } = useDeleteLabel(setSelectedLabel);
 
-  //delete customer (err handled, success handled) (custom hooks)
-  const { data: deleteCustomerResponse, isLoading: isDeleteCustomerLoading, mutate: deleteCustomer } = useDeleteCustomer({ setSelectedCustomer, setIsMoveToActive });
+  //delete customer (err handled, success handled) (custom hooks, moved into CustomerModal component)
+  // const { data: deleteCustomerResponse, isLoading: isDeleteCustomerLoading, mutate: deleteCustomer } = useDeleteCustomer({ setSelectedCustomer, setIsMoveToActive });
 
-  //update label (err handled, success handled) (custom hooks)
-  const { data: updateLabelResponse, mutate: updateLabel } = useUpdateLabel({ setIsLabelRename, setLabelRename });
+  //update label (err handled, success handled) (custom hooks, moved to LabelModal component)
+  // const { data: updateLabelResponse, mutate: updateLabel } = useUpdateLabel({ setIsLabelRename, setLabelRename });
 
-  //update customer (err handled, success handled) (custom hooks)
-  const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({ setIsMoveToActive, setSelectedCustomer });
+  //update customer (err handled, success handled) (custom hooks, moved into CustomerModal component)
+  // const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({ setIsMoveToActive, setSelectedCustomer });
 
   const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, labelName: string) => {
     e.preventDefault();
@@ -133,69 +134,10 @@ export default function Home() {
       />
 
       {/* label prompt */}
-      {selectedLabel ? (
-        <div>
-          <div
-            className="fixed top-0 left-0 w-screen h-screen bg-slate-500 bg-opacity-50 flex justify-center items-center"
-            // onClick={() => {
-            //   setSelectedLabel(null);
-            //   setIsLabelRename(false);
-            // }}
-          ></div>
-          <div className="bg-white max-w-3xl fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col divide-y-2 min-w-[18rem] rounded-lg">
-            {isLabelRename ? (
-              <div className="px-4 flex justify-center py-2 cursor-pointer">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log(labelRename);
-                    updateLabel({ labelId: selectedLabel._id, labelName: labelRename });
-                  }}
-                  className="flex flex-col"
-                >
-                  <input
-                    type="text"
-                    value={labelRename}
-                    onChange={(e) => setLabelRename(e.target.value)}
-                    className="text-center mb-2 bg-slate-100 py-1"
-                    placeholder="Enter new label here"
-                  />
-                  <button type="submit">Save</button>
-                </form>
-              </div>
-            ) : (
-              <div
-                className="px-4 flex justify-center py-2 cursor-pointer"
-                onClick={() => {
-                  setIsLabelRename(true);
-                  // setLabelRename(selectedLabel.name);
-                }}
-              >
-                <p>Rename</p>
-              </div>
-            )}
-
-            <div
-              className="px-4 flex justify-center py-2 cursor-pointer"
-              onClick={() => {
-                deleteLabel(selectedLabel._id);
-              }}
-            >
-              <p>Delete</p>
-            </div>
-
-            <div
-              onClick={() => {
-                setSelectedLabel(null);
-                setIsLabelRename(false);
-              }}
-              className="px-4 flex justify-center py-2 cursor-pointer"
-            >
-              <p>Cancel</p>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <LabelModal
+        selectedLabel={selectedLabel}
+        setSelectedLabel={setSelectedLabel}
+      />
 
       {/* add label form */}
       <form
