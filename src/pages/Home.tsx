@@ -13,7 +13,8 @@ import useUpdateLabel from "../hooks/label/useUpdateLabel";
 import useUpdateCustomer from "../hooks/customer/useUpdateCustomer";
 import CustomerModal from "../components/modals/CustomerModal";
 import LabelModal from "../components/modals/LabelModal";
-import AddLabelForm from "../components/forms/AddLabelForm";
+import AddLabelForm from "../components/forms/CreateLabelForm";
+import CreateCustomerForm from "../components/forms/CreateCustomerForm";
 
 type Label = {
   _id: string;
@@ -69,16 +70,16 @@ export default function Home() {
   const [isCreateCustomerActive, setIsCreateCustomerActive] = useState(false);
 
   //get labels (Custom hooks)
-  const { data: labels, isLoading: isLabelLoading } = useGetLabel();
+  const { data: labels, isLoading: isLabelLoading, isError: isLabelsError } = useGetLabel();
 
   //get customer (Custom hooks)
-  const { data: customers, isLoading: isCustomerLoading } = useGetCustomer({ labelId: searchParams.get("label") });
+  const { data: customers, isLoading: isCustomerLoading, isError: isCustomersError } = useGetCustomer({ labelId: searchParams.get("label") });
 
   //create label (err handled, success handled) (Custom hooks, moved into AddLabelForm component)
   // const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
 
   //create customer (err handled, success handled) (custom hooks)
-  const { data: createCustomerResponse, isLoading: isCreateCustomerLoading, mutate: createCustomer } = useCreateCustomer(setIsCreateCustomerActive);
+  // const { data: createCustomerResponse, isLoading: isCreateCustomerLoading, mutate: createCustomer } = useCreateCustomer(setIsCreateCustomerActive);
 
   // delete label (err handled, success handled) (custom hooks, moved to LabelModal component)
   // const { data: deleteLabelResponse, isLoading: isDeleteLabelLoading, mutate: deleteLabel } = useDeleteLabel(setSelectedLabel);
@@ -102,18 +103,18 @@ export default function Home() {
   //   createLabel(labelName);
   // };
 
-  const customerOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, custData: CustomerDataParam) => {
-    e.preventDefault();
-    if (!customer.name) {
-      return toast.error("Customer name can't be empty");
-    }
+  // const customerOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, custData: CustomerDataParam) => {
+  //   e.preventDefault();
+  //   if (!customer.name) {
+  //     return toast.error("Customer name can't be empty");
+  //   }
 
-    // const isLabelValid = labels?.labels.filter((label) => label._id === searchParams.get("label"));
-    // if (isLabelValid?.length === 0) {
-    //   return toast.error("Invalid label id, please select the label first");
-    // }
-    createCustomer(custData);
-  };
+  //   // const isLabelValid = labels?.labels.filter((label) => label._id === searchParams.get("label"));
+  //   // if (isLabelValid?.length === 0) {
+  //   //   return toast.error("Invalid label id, please select the label first");
+  //   // }
+  //   createCustomer(custData);
+  // };
 
   if (isLabelLoading || isCustomerLoading) {
     return <div>LOADING ...</div>;
@@ -175,7 +176,7 @@ export default function Home() {
       </div>
 
       {/* Create customer form */}
-      {isCreateCustomerActive ? (
+      {/* {isCreateCustomerActive ? (
         <form
           onSubmit={(e) => {
             customerOnSubmitHandler(e, { name: customer.name, description: customer.description, labelId: searchParams.get("label") });
@@ -204,7 +205,9 @@ export default function Home() {
         >
           Create customer
         </div>
-      )}
+      )} */}
+
+      <CreateCustomerForm labels={labels!} />
 
       {/* Render customer */}
       <div className="flex flex-col gap-2 my-2">

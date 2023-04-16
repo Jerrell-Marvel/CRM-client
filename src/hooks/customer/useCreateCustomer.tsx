@@ -10,7 +10,11 @@ type MutationFnParam = {
   labelId: string | null;
 };
 
-const useCreateCustomer = (setIsCreateCustomerActive: React.Dispatch<React.SetStateAction<boolean>>) => {
+type UseCreateCustomerParam = {
+  successCb: () => void;
+};
+
+const useCreateCustomer = ({ successCb }: UseCreateCustomerParam) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -29,8 +33,9 @@ const useCreateCustomer = (setIsCreateCustomerActive: React.Dispatch<React.SetSt
         customers.unshift(data.customer);
         queryClient.setQueryData<Customers>(["customers", data.customer.labelId], { customers: customers });
       }
-      setIsCreateCustomerActive(false);
+
       toast.success("Customer added successfully");
+      successCb();
     },
 
     onError: (err) => {
