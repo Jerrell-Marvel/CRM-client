@@ -13,6 +13,7 @@ import useUpdateLabel from "../hooks/label/useUpdateLabel";
 import useUpdateCustomer from "../hooks/customer/useUpdateCustomer";
 import CustomerModal from "../components/modals/CustomerModal";
 import LabelModal from "../components/modals/LabelModal";
+import AddLabelForm from "../components/forms/AddLabelForm";
 
 type Label = {
   _id: string;
@@ -73,8 +74,8 @@ export default function Home() {
   //get customer (Custom hooks)
   const { data: customers, isLoading: isCustomerLoading } = useGetCustomer({ labelId: searchParams.get("label") });
 
-  //create label (err handled, success handled) (Custom hooks)
-  const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
+  //create label (err handled, success handled) (Custom hooks, moved into AddLabelForm component)
+  // const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
 
   //create customer (err handled, success handled) (custom hooks)
   const { data: createCustomerResponse, isLoading: isCreateCustomerLoading, mutate: createCustomer } = useCreateCustomer(setIsCreateCustomerActive);
@@ -91,14 +92,15 @@ export default function Home() {
   //update customer (err handled, success handled) (custom hooks, moved into CustomerModal component)
   // const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({ setIsMoveToActive, setSelectedCustomer });
 
-  const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, labelName: string) => {
-    e.preventDefault();
+  //Label submit handler
+  // const labelOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, labelName: string) => {
+  //   e.preventDefault();
 
-    if (!labelName) {
-      return toast.error("Label name can't be empty");
-    }
-    createLabel(labelName);
-  };
+  //   if (!labelName) {
+  //     return toast.error("Label name can't be empty");
+  //   }
+  //   createLabel(labelName);
+  // };
 
   const customerOnSubmitHandler = (e: React.FormEvent<HTMLFormElement>, custData: CustomerDataParam) => {
     e.preventDefault();
@@ -140,22 +142,7 @@ export default function Home() {
       />
 
       {/* add label form */}
-      <form
-        onSubmit={(e) => {
-          labelOnSubmitHandler(e, labelName);
-        }}
-        className="mb-2 flex gap-2"
-      >
-        <input
-          type="text"
-          onChange={(e) => {
-            setLabelName(e.target.value);
-          }}
-          value={labelName}
-          placeholder="add new label"
-        />
-        <button type="submit">create label</button>
-      </form>
+      <AddLabelForm />
 
       {/* Render label */}
       <div className="flex gap-x-4 gap-y-2 overflow-auto border-b-2 mb-2l">

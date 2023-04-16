@@ -4,9 +4,14 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { Label, Labels } from "../../types/label";
 
-const useCreateLabel = () => {
+type UseCreateLabel = {
+  successCb: () => void;
+};
+
+const useCreateLabel = ({ successCb }: UseCreateLabel) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
   return useMutation<{ label: Label }, AxiosError, string>({
     mutationFn: async (labelName) => {
       const response = await axios.post<{ label: Label }>(`http://localhost:5000/api/v1/label`, { name: labelName }, { withCredentials: true });
@@ -24,6 +29,8 @@ const useCreateLabel = () => {
         queryClient.setQueryData<Labels>("labels", { labels });
         toast.success("Customer created");
       }
+
+      successCb();
     },
 
     onError: (err) => {
