@@ -1,7 +1,8 @@
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { Label } from "../../types/label";
 import useUpdateLabel from "../../hooks/label/useUpdateLabel";
 import useDeleteLabel from "../../hooks/label/useDeleteLabel";
+import { toast } from "react-toastify";
 
 type LabelModalProps = {
   selectedLabel: Label | null;
@@ -26,6 +27,14 @@ const LabelModal = ({ selectedLabel, setSelectedLabel }: LabelModalProps) => {
     },
   });
 
+  const labelRenameInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (isLabelRename && labelRenameInputRef.current) {
+      labelRenameInputRef.current.focus();
+    }
+  }, [isLabelRename]);
+
   return (
     <>
       {selectedLabel ? (
@@ -43,7 +52,10 @@ const LabelModal = ({ selectedLabel, setSelectedLabel }: LabelModalProps) => {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    console.log(labelRename);
+
+                    if (!labelRename) {
+                      return toast.error("Label name can't be empty");
+                    }
                     updateLabel({ labelId: selectedLabel._id, labelName: labelRename });
                   }}
                   className="flex flex-col"
@@ -54,6 +66,7 @@ const LabelModal = ({ selectedLabel, setSelectedLabel }: LabelModalProps) => {
                     onChange={(e) => setLabelRename(e.target.value)}
                     className="text-center mb-2 bg-slate-100 py-1"
                     placeholder="Enter new label here"
+                    ref={labelRenameInputRef}
                   />
                   <button type="submit">Save</button>
                 </form>
@@ -63,6 +76,8 @@ const LabelModal = ({ selectedLabel, setSelectedLabel }: LabelModalProps) => {
                 className="px-4 flex justify-center py-2 cursor-pointer"
                 onClick={() => {
                   setIsLabelRename(true);
+                  setLabelRename(selectedLabel.name);
+
                   // setLabelRename(selectedLabel.name);
                 }}
               >
