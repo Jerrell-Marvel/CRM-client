@@ -15,6 +15,7 @@ import CustomerModal from "../components/modals/CustomerModal";
 import LabelModal from "../components/modals/LabelModal";
 import AddLabelForm from "../components/forms/CreateLabelForm";
 import CreateCustomerForm from "../components/forms/CreateCustomerForm";
+import SearchCustomerForm from "../components/forms/SearchCustomerForm";
 
 type Label = {
   _id: string;
@@ -122,6 +123,7 @@ export default function Home() {
 
   return (
     <div className="py-4">
+      <SearchCustomerForm />
       {/* <div
         onClick={() => {
           setCounter(counter + 1);

@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import Customer from "./pages/Customer";
 import EditCustomer from "./pages/EditCustomer";
 import "react-toastify/dist/ReactToastify.css";
+import Search from "./pages/Search";
 
 const queryClient = new QueryClient();
 function App() {
@@ -42,6 +43,10 @@ function App() {
               <Route
                 path="/edit-customer/:id"
                 element={<EditCustomer />}
+              />
+              <Route
+                path="/search"
+                element={<Search />}
               />
             </Routes>
 
