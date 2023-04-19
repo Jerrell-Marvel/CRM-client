@@ -10,6 +10,7 @@ import Customer from "./pages/Customer";
 import EditCustomer from "./pages/EditCustomer";
 import "react-toastify/dist/ReactToastify.css";
 import Search from "./pages/Search";
+import Test from "./pages/Test";
 
 const queryClient = new QueryClient();
 function App() {
@@ -47,6 +48,11 @@ function App() {
               <Route
                 path="/search"
                 element={<Search />}
+              />
+
+              <Route
+                path="/test"
+                element={<Test />}
               />
             </Routes>
 

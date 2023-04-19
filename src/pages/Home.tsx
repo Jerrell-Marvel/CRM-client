@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import LabelModal from "../components/modals/LabelModal";
 import AddLabelForm from "../components/forms/CreateLabelForm";
 import CreateCustomerForm from "../components/forms/CreateCustomerForm";
 import SearchCustomerForm from "../components/forms/SearchCustomerForm";
+import useGetCustomers2 from "../hooks/customer/useGetCustomers2";
 
 type Label = {
   _id: string;
@@ -74,7 +75,47 @@ export default function Home() {
   const { data: labels, isLoading: isLabelLoading, isError: isLabelsError } = useGetLabel();
 
   //get customer (Custom hooks)
-  const { data: customers, isLoading: isCustomerLoading, isError: isCustomersError } = useGetCustomer({ labelId: searchParams.get("label") });
+  const { data: customers, isLoading: isCustomerLoading, isError: isCustomersError, hasNextPage, fetchNextPage } = useGetCustomers2({ labelId: searchParams.get("label"), limit: 10 });
+
+  const lastElementRef = useRef<HTMLDivElement>(null);
+
+  //Memoize the observer by using useMemo, this observer can also be put inside the useEffect, but the observer will be created every time the data changes
+  const observer = useMemo(() => {
+    return new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // console.log("is visible");
+          fetchNextPage();
+        }
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    // console.log("Data changing");
+    // console.log("YES DATA" + data);
+    const tempLastElementRef = lastElementRef.current;
+
+    // console.log("OBSERVING");
+    // console.log(tempLastElementRef);
+    if (tempLastElementRef && hasNextPage) {
+      observer.observe(lastElementRef.current);
+    }
+
+    // console.log(a);
+
+    return () => {
+      if (tempLastElementRef) {
+        observer.unobserve(tempLastElementRef);
+        // console.log("CLEANING UP");
+        // console.log(tempLastElementRef);
+      }
+
+      //   console.log("CLEANing UP ");
+      //   console.log(tempLastElementRef);
+      //   console.log(a);
+    };
+  }, [customers]);
 
   //create label (err handled, success handled) (Custom hooks, moved into AddLabelForm component)
   // const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
@@ -213,29 +254,57 @@ export default function Home() {
 
       {/* Render customer */}
       <div className="flex flex-col gap-2 my-2">
-        {customers?.customers.map((customer) => {
-          return (
-            <div
-              className="flex gap-2 bg-white px-4 rounded-md py-2"
-              key={customer._id}
-            >
-              <Link
-                key={customer._id}
-                to={`/customer/${customer._id}`}
-              >
-                <p>{customer.name}</p>
+        {customers?.pages.map((group, i) => {
+          return group.customers.map((customer, idx) => {
+            if (group.customers.length === idx + 1) {
+              return (
+                <div
+                  className="flex gap-2 bg-white px-4 rounded-md py-2"
+                  key={customer._id}
+                  ref={lastElementRef}
+                >
+                  <Link
+                    key={customer._id}
+                    to={`/customer/${customer._id}`}
+                  >
+                    <p>{customer.name}</p>
 
-                {/* <span>Move to</span> */}
-              </Link>
-              <span
-                onClick={() => {
-                  setSelectedCustomer(customer);
-                }}
-              >
-                ...
-              </span>
-            </div>
-          );
+                    {/* <span>Move to</span> */}
+                  </Link>
+                  <span
+                    onClick={() => {
+                      setSelectedCustomer(customer);
+                    }}
+                  >
+                    ...
+                  </span>
+                </div>
+              );
+            } else {
+              return (
+                <div
+                  className="flex gap-2 bg-white px-4 rounded-md py-2"
+                  key={customer._id}
+                >
+                  <Link
+                    key={customer._id}
+                    to={`/customer/${customer._id}`}
+                  >
+                    <p>{customer.name}</p>
+
+                    {/* <span>Move to</span> */}
+                  </Link>
+                  <span
+                    onClick={() => {
+                      setSelectedCustomer(customer);
+                    }}
+                  >
+                    ...
+                  </span>
+                </div>
+              );
+            }
+          });
         })}
       </div>
     </div>

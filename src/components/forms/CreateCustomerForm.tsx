@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import useCreateCustomer from "../../hooks/customer/useCreateCustomer";
 import { toast } from "react-toastify";
 import { Labels } from "../../types/label";
+import useCreateCustomer2 from "../../hooks/customer/useCreateCustomer2";
 
 type CustomerDataParam = {
   name: string;
@@ -23,7 +24,7 @@ const CreateCustomerForm = ({ labels }: CreateCustomerFormParam) => {
     data: createCustomerResponse,
     isLoading: isCreateCustomerLoading,
     mutate: createCustomer,
-  } = useCreateCustomer({
+  } = useCreateCustomer2({
     onSuccess: () => {
       setIsCreateCustomerActive(false);
       setCustomer({ name: "", description: "" });
