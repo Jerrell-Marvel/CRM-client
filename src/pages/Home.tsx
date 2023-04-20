@@ -16,6 +16,9 @@ import LabelModal from "../components/modals/LabelModal";
 import AddLabelForm from "../components/forms/CreateLabelForm";
 import CreateCustomerForm from "../components/forms/CreateCustomerForm";
 import SearchCustomerForm from "../components/forms/SearchCustomerForm";
+import Pagination from "../components/pagination/Pagination";
+import useGetCustomers from "../hooks/customer/useGetCustomers";
+import { convertToValidPage } from "../utils/convertToValidPage";
 
 type Label = {
   _id: string;
@@ -74,7 +77,7 @@ export default function Home() {
   const { data: labels, isLoading: isLabelLoading, isError: isLabelsError } = useGetLabel();
 
   //get customer (Custom hooks)
-  const { data: customers, isLoading: isCustomerLoading, isError: isCustomersError } = useGetCustomer({ labelId: searchParams.get("label") });
+  const { data: customers, isLoading: isCustomerLoading, isError: isCustomersError, customersCount } = useGetCustomers({ labelId: searchParams.get("label"), page: convertToValidPage(searchParams.get("page")) });
 
   //create label (err handled, success handled) (Custom hooks, moved into AddLabelForm component)
   // const { data: createLabelResponse, isLoading: isCreateLabelLoading, mutate: createLabel } = useCreateLabel();
@@ -159,7 +162,7 @@ export default function Home() {
                 className="cursor-pointer"
                 key={label._id}
                 onClick={() => {
-                  navigate(`/?label=${label._id}`);
+                  navigate(`/?label=${label._id}&page=1`);
                 }}
               >
                 {label.name}
@@ -210,6 +213,12 @@ export default function Home() {
       )} */}
 
       <CreateCustomerForm labels={labels!} />
+
+      <Pagination
+        dataCount={customersCount}
+        activePage={convertToValidPage(searchParams.get("page"))}
+        limit={10}
+      />
 
       {/* Render customer */}
       <div className="flex flex-col gap-2 my-2">
