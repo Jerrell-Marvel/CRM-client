@@ -1,8 +1,9 @@
+import { useNavigate, useParams } from "react-router";
+import CreateCustomerForm from "../components/forms/CreateCustomerForm";
+import useCreateCustomer from "../hooks/customer/useCreateCustomer";
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import useCreateCustomer from "../../hooks/customer/useCreateCustomer";
 import { toast } from "react-toastify";
-import { Labels } from "../../types/label";
+import { useSearchParams } from "react-router-dom";
 
 type CustomerDataParam = {
   name: string;
@@ -10,14 +11,12 @@ type CustomerDataParam = {
   labelId: string | null;
 };
 
-type CreateCustomerFormParam = {
-  labels?: Labels;
-};
-
-const CreateCustomerForm = ({ labels }: CreateCustomerFormParam) => {
+const CreateCustomer = () => {
+  const { labelId } = useParams();
   const [isCreateCustomerActive, setIsCreateCustomerActive] = useState(false);
-  const [searchParams] = useSearchParams();
   const [customer, setCustomer] = useState<{ name: string; description: string }>({ name: "", description: "" });
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const {
     data: createCustomerResponse,
@@ -25,8 +24,9 @@ const CreateCustomerForm = ({ labels }: CreateCustomerFormParam) => {
     mutate: createCustomer,
   } = useCreateCustomer({
     onSuccess: () => {
-      setIsCreateCustomerActive(false);
-      setCustomer({ name: "", description: "" });
+      // setIsCreateCustomerActive(false);
+      // setCustomer({ name: "", description: "" });
+      navigate(`/?label=${labelId}`);
     },
   });
 
@@ -45,9 +45,14 @@ const CreateCustomerForm = ({ labels }: CreateCustomerFormParam) => {
 
   return (
     <>
+      <div>CREATING CUSTOMER</div>
       <form
         onSubmit={(e) => {
-          customerOnSubmitHandler(e, { name: customer.name, description: customer.description, labelId: searchParams.get("label") });
+          if (!labelId) {
+            return toast.error("Invalid label id, please select a label");
+          }
+
+          customerOnSubmitHandler(e, { name: customer.name, description: customer.description, labelId: labelId });
         }}
       >
         <input
@@ -65,4 +70,4 @@ const CreateCustomerForm = ({ labels }: CreateCustomerFormParam) => {
   );
 };
 
-export default CreateCustomerForm;
+export default CreateCustomer;

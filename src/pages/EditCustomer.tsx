@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "react-query";
 import { useParams } from "react-router";
 import useUpdateCustomer from "../hooks/customer/useUpdateCustomer";
 import useGetCustomer from "../hooks/customer/useGetCustomer";
+import useGetLabel from "../hooks/label/useGetLabel";
 
 type Customer = {
   customer: {
@@ -54,6 +55,8 @@ export default function EditCustomer() {
   });
 
   const { data: updateCustData, isLoading: isUpdateCustLoading, mutate: updateCustomer } = useUpdateCustomer({});
+
+  const { data: labels, isLoading: isLabelLoading, isError: isLabelsError } = useGetLabel();
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCustomerData({

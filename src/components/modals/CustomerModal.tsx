@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Customer } from "../../types/customer";
 import { Labels } from "../../types/label";
 import useDeleteCustomer from "../../hooks/customer/useDeleteCustomer";
 import { useState } from "react";
 import useUpdateCustomer from "../../hooks/customer/useUpdateCustomer";
+import { useQueryClient } from "react-query";
 
 type CustomerModalProps = {
   selectedCustomer: Customer | null;
@@ -12,6 +13,8 @@ type CustomerModalProps = {
 };
 const CustomerModal = ({ selectedCustomer, setSelectedCustomer, labels }: CustomerModalProps) => {
   const [isMoveToActive, setIsMoveToActive] = useState(false);
+  const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const {
     data: deleteCustomerResponse,
     isLoading: isDeleteCustomerLoading,
@@ -25,6 +28,7 @@ const CustomerModal = ({ selectedCustomer, setSelectedCustomer, labels }: Custom
 
   const { data: updateCustomerResponse, mutate: updateCustomer } = useUpdateCustomer({
     onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ["customers", selectedCustomer?.labelId, Number(searchParams.get("page"))], active: true, exact: true });
       setSelectedCustomer(null);
       setIsMoveToActive(false);
     },

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { Customer, Customers } from "../../types/customer";
+import { useSearchParams } from "react-router-dom";
 
 type UseDeleteCustomerParams = {
   // setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
@@ -13,6 +14,7 @@ type UseDeleteCustomerParams = {
 const useDeleteCustomer = ({ onSuccess }: UseDeleteCustomerParams) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   return useMutation<{ deletedCustomer: Customer }, AxiosError, string>({
     mutationFn: async (customerId: string) => {
@@ -22,14 +24,16 @@ const useDeleteCustomer = ({ onSuccess }: UseDeleteCustomerParams) => {
     },
 
     onSuccess: (data) => {
-      const customerData = queryClient.getQueryData<Customers>(["customers", data.deletedCustomer.labelId]);
-      if (customerData) {
-        const customers = [...customerData.customers];
-        const deletedCustomers = customers.filter((customer) => {
-          return customer._id !== data.deletedCustomer._id;
-        });
-        queryClient.setQueryData<Customers>(["customers", data.deletedCustomer.labelId], { customers: deletedCustomers });
-      }
+      // const customerData = queryClient.getQueryData<Customers>(["customers", data.deletedCustomer.labelId]);
+      // if (customerData) {
+      //   const customers = [...customerData.customers];
+      //   const deletedCustomers = customers.filter((customer) => {
+      //     return customer._id !== data.deletedCustomer._id;
+      //   });
+      //   queryClient.setQueryData<Customers>(["customers", data.deletedCustomer.labelId], { customers: deletedCustomers });
+      // }
+
+      queryClient.refetchQueries({ queryKey: ["customers", data.deletedCustomer.labelId, Number(searchParams.get("page"))], active: true, exact: true });
 
       toast.success("Customer deleted successfully");
 

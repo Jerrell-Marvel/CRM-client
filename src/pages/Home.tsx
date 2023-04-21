@@ -212,7 +212,9 @@ export default function Home() {
         </div>
       )} */}
 
-      <CreateCustomerForm labels={labels!} />
+      {/* <CreateCustomerForm labels={labels!} /> */}
+
+      {searchParams.get("label") ? <Link to={`/create/${searchParams.get("label")}`}>Create cust</Link> : null}
 
       <Pagination
         dataCount={customersCount}

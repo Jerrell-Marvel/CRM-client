@@ -10,6 +10,8 @@ import Customer from "./pages/Customer";
 import EditCustomer from "./pages/EditCustomer";
 import "react-toastify/dist/ReactToastify.css";
 import Search from "./pages/Search";
+import CreateCustomerForm from "./components/forms/CreateCustomerForm";
+import CreateCustomer from "./pages/CreateCustomer";
 
 const queryClient = new QueryClient();
 function App() {
@@ -47,6 +49,10 @@ function App() {
               <Route
                 path="/search"
                 element={<Search />}
+              />
+              <Route
+                path="/create/:labelId"
+                element={<CreateCustomer />}
               />
             </Routes>
 

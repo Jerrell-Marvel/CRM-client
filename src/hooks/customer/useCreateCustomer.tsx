@@ -27,12 +27,12 @@ const useCreateCustomer = ({ onSuccess }: UseCreateCustomerParam) => {
     },
 
     onSuccess: (data) => {
-      const customerData = queryClient.getQueryData<Customers>(["customers", data.customer.labelId]);
-      if (customerData) {
-        const customers = [...customerData.customers];
-        customers.unshift(data.customer);
-        queryClient.setQueryData<Customers>(["customers", data.customer.labelId], { customers: customers });
-      }
+      // const customerData = queryClient.getQueryData<Customers>(["customers", data.customer.labelId]);
+      // if (customerData) {
+      //   const customers = [...customerData.customers];
+      //   customers.unshift(data.customer);
+      //   queryClient.setQueryData<Customers>(["customers", data.customer.labelId], { customers: customers });
+      // }
 
       toast.success("Customer added successfully");
       onSuccess();
