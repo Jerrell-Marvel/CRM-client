@@ -19,7 +19,7 @@ function App() {
         position="top-center"
         autoClose={1000}
       />
-      <div className="max-w-3xl  mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="">
           <QueryClientProvider client={queryClient}>
             <Routes>

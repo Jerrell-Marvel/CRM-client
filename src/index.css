@@ -6,6 +6,12 @@ body {
   @apply bg-slate-200;
 }
 
+@layer base {
+  input {
+    @apply bg-slate-100 px-2 py-1 focus:outline-none;
+  }
+}
+
 @layer components {
   .btn {
     @apply px-2 py-1 bg-slate-900 text-white rounded-md hover:bg-white hover:text-black border-[1px] hover:border-black;

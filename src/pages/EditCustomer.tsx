@@ -63,6 +63,7 @@ export default function EditCustomer() {
   };
   return (
     <div>
+      <h1 className="uppercase font-medium text-xl my-2 mx-4 sm:text-2xl md:text-3xl">Update Customer</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -75,25 +76,41 @@ export default function EditCustomer() {
             },
           });
         }}
+        className="p-4 rounded-md bg-white flex flex-col gap-4"
       >
-        <input
-          type="text"
-          value={customerData.name}
-          name="name"
-          onChange={(e) => {
-            onChangeHandler(e);
-          }}
-        />
-        <input
-          type="text"
-          value={customerData.description}
-          name="description"
-          onChange={(e) => {
-            onChangeHandler(e);
-          }}
-        />
+        <div className="flex flex-col">
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            value={customerData.name}
+            name="name"
+            onChange={(e) => {
+              onChangeHandler(e);
+            }}
+            id="name"
+          />
+        </div>
 
-        <button type="submit">SUBMIT</button>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="name">Description</label>
+          <input
+            type="text"
+            value={customerData.description}
+            name="description"
+            onChange={(e) => {
+              onChangeHandler(e);
+            }}
+          />
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="btn w-fit"
+          >
+            submit
+          </button>
+        </div>
       </form>
     </div>
   );
