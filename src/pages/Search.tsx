@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import useSearchCustomer from "../hooks/customer/useSearchCustomer";
 import SearchCustomerForm from "../components/forms/SearchCustomerForm";
 
@@ -7,10 +7,15 @@ const Search = () => {
   const { data } = useSearchCustomer({ q: searchParams.get("q") });
   return (
     <>
-      <SearchCustomerForm />
+      <SearchCustomerForm customerName={searchParams.get("q")} />
       <div>
         {data?.customers.map((customer) => {
-          return <div>{customer.name}</div>;
+          return (
+            <div>
+              <p> {customer.name}</p>
+              <Link to={`/?label=${customer.labelId._id}`}>in {customer.labelId.name}</Link>
+            </div>
+          );
         })}
       </div>
     </>

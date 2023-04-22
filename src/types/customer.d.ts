@@ -1,3 +1,5 @@
+import { Label } from "./label";
+
 export type Customer = {
   _id: string;
   name: string;
@@ -8,4 +10,10 @@ export type Customer = {
 
 export type Customers = {
   customers: Customer[];
+};
+
+type CustomerWithLabel = Omit<Customer, "labelId"> & { labelId: Label };
+
+export type CustomersWithLabel = {
+  customers: CustomerWithLabel[];
 };

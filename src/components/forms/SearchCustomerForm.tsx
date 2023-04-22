@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-const SearchCustomerForm = () => {
-  const [customerName, setCustomerName] = useState("");
+type SearchCustomerFormProps = {
+  customerName?: string | null;
+};
+
+const SearchCustomerForm = ({ customerName: custName }: SearchCustomerFormProps) => {
+  const [customerName, setCustomerName] = useState(() => {
+    return custName || "";
+  });
   const navigate = useNavigate();
   return (
     <form
@@ -14,6 +20,7 @@ const SearchCustomerForm = () => {
       <input
         type="text"
         value={customerName}
+        placeholder="search"
         onChange={(e) => {
           setCustomerName(e.target.value);
         }}
