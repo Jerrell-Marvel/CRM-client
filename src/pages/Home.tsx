@@ -118,9 +118,9 @@ export default function Home() {
   //   createCustomer(custData);
   // };
 
-  if (isLabelLoading || isCustomerLoading) {
-    return <div>LOADING ...</div>;
-  }
+  // if (isLabelLoading || isCustomerLoading) {
+  //   return <div>LOADING ...</div>;
+  // }
 
   return (
     <>
@@ -137,8 +137,9 @@ export default function Home() {
         setSelectedLabel={setSelectedLabel}
       />
       <div className="py-4 flex flex-col gap-2">
-        <SearchCustomerForm />
-        {/* <div
+        <div className="bg-white rounded-md p-4 flex flex-col gap-6">
+          <SearchCustomerForm />
+          {/* <div
         onClick={() => {
           setCounter(counter + 1);
         }}
@@ -146,37 +147,38 @@ export default function Home() {
         +
       </div> */}
 
-        {/* add label form */}
-        <CreateLabelForm />
+          {/* add label form */}
+          <CreateLabelForm />
 
-        {/* Render label */}
-        <div className="flex gap-x-2 overflow-auto border-b-2 bg-white p-4 rounded-md">
-          {labels?.labels.map((label) => {
-            return (
-              <div
-                className={`flex whitespace-nowrap border-[1px] border-slate-200 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-200 border-none" : ""}`}
-                key={label._id}
-              >
+          {/* Render label */}
+          <div className="flex gap-x-2 overflow-auto border-b-2 bg-white pb-2">
+            {labels?.labels.map((label) => {
+              return (
                 <div
-                  className="cursor-pointer px-4"
+                  className={`flex whitespace-nowrap border-[1px] border-slate-200 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-200 border-none" : ""}`}
                   key={label._id}
-                  onClick={() => {
-                    navigate(`/?label=${label._id}`);
-                  }}
                 >
-                  {label.name}
+                  <div
+                    className="cursor-pointer px-4"
+                    key={label._id}
+                    onClick={() => {
+                      navigate(`/?label=${label._id}`);
+                    }}
+                  >
+                    {label.name}
+                  </div>
+                  <span
+                    onClick={() => {
+                      setSelectedLabel(label);
+                    }}
+                    className="cursor-pointer pr-4"
+                  >
+                    ...
+                  </span>
                 </div>
-                <span
-                  onClick={() => {
-                    setSelectedLabel(label);
-                  }}
-                  className="cursor-pointer pr-4"
-                >
-                  ...
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Create customer form */}

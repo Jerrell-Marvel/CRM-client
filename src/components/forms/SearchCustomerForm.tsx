@@ -16,7 +16,7 @@ const SearchCustomerForm = ({ customerName: custName }: SearchCustomerFormProps)
         e.preventDefault();
         navigate(`/search?q=${customerName}`);
       }}
-      className="bg-white p-4 rounded-md"
+      className=""
     >
       <div className="flex w-full gap-2">
         <input
