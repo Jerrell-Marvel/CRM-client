@@ -29,7 +29,7 @@ const CreateLabelForm = () => {
           e.preventDefault();
           labelOnSubmitHandler(labelName);
         }}
-        className="mb-2 flex gap-2"
+        className="bg-white px-4 py-4 rounded-md flex gap-2 items-center"
       >
         <input
           type="text"
@@ -38,8 +38,14 @@ const CreateLabelForm = () => {
           }}
           value={labelName}
           placeholder="add new label"
+          className="bg-slate-100 px-2 py-1 focus:outline-none"
         />
-        <button type="submit">create label</button>
+        <button
+          type="submit"
+          className="btn"
+        >
+          create label
+        </button>
       </form>
     </>
   );

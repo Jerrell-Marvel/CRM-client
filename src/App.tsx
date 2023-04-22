@@ -19,8 +19,8 @@ function App() {
         position="top-center"
         autoClose={1000}
       />
-      <div className="max-w-3xl bg-slate-200 mx-auto">
-        <div className="px-4">
+      <div className="max-w-3xl  mx-auto">
+        <div className="">
           <QueryClientProvider client={queryClient}>
             <Routes>
               <Route
@@ -50,10 +50,10 @@ function App() {
               />
             </Routes>
 
-            <ReactQueryDevtools
+            {/* <ReactQueryDevtools
               initialIsOpen={false}
               position="bottom-left"
-            />
+            /> */}
           </QueryClientProvider>
         </div>
       </div>

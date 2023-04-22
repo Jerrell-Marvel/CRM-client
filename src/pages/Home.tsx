@@ -16,6 +16,7 @@ import LabelModal from "../components/modals/LabelModal";
 import AddLabelForm from "../components/forms/CreateLabelForm";
 import CreateCustomerForm from "../components/forms/CreateCustomerForm";
 import SearchCustomerForm from "../components/forms/SearchCustomerForm";
+import CreateLabelForm from "../components/forms/CreateLabelForm";
 
 type Label = {
   _id: string;
@@ -122,15 +123,7 @@ export default function Home() {
   }
 
   return (
-    <div className="py-4">
-      <SearchCustomerForm />
-      {/* <div
-        onClick={() => {
-          setCounter(counter + 1);
-        }}
-      >
-        +
-      </div> */}
+    <>
       {/* Selected customer modal */}
       <CustomerModal
         selectedCustomer={selectedCustomer}
@@ -138,47 +131,56 @@ export default function Home() {
         labels={labels}
       />
 
-      {/* label prompt */}
+      {/* label modal */}
       <LabelModal
         selectedLabel={selectedLabel}
         setSelectedLabel={setSelectedLabel}
       />
+      <div className="py-4 flex flex-col gap-2">
+        <SearchCustomerForm />
+        {/* <div
+        onClick={() => {
+          setCounter(counter + 1);
+        }}
+      >
+        +
+      </div> */}
 
-      {/* add label form */}
-      <AddLabelForm />
+        {/* add label form */}
+        <CreateLabelForm />
 
-      {/* Render label */}
-      <div className="flex gap-x-4 gap-y-2 overflow-auto border-b-2 mb-2l">
-        {labels?.labels.map((label) => {
-          return (
-            <div
-              className={`flex h-fit whitespace-nowrap gap-2 border-[1px] border-slate-300 px-4 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-300" : ""}`}
-              key={label._id}
-            >
+        {/* Render label */}
+        <div className="flex gap-x-2 overflow-auto border-b-2 bg-white p-4 rounded-md">
+          {labels?.labels.map((label) => {
+            return (
               <div
-                className="cursor-pointer"
+                className={`flex whitespace-nowrap border-[1px] border-slate-200 rounded-full ${searchParams.get("label") === label._id ? "bg-slate-200 border-none" : ""}`}
                 key={label._id}
-                onClick={() => {
-                  navigate(`/?label=${label._id}`);
-                }}
               >
-                {label.name}
+                <div
+                  className="cursor-pointer px-4"
+                  key={label._id}
+                  onClick={() => {
+                    navigate(`/?label=${label._id}`);
+                  }}
+                >
+                  {label.name}
+                </div>
+                <span
+                  onClick={() => {
+                    setSelectedLabel(label);
+                  }}
+                  className="cursor-pointer pr-4"
+                >
+                  ...
+                </span>
               </div>
-              <span
-                onClick={() => {
-                  setSelectedLabel(label);
-                }}
-                className="cursor-pointer"
-              >
-                ...
-              </span>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      {/* Create customer form */}
-      {/* {isCreateCustomerActive ? (
+        {/* Create customer form */}
+        {/* {isCreateCustomerActive ? (
         <form
           onSubmit={(e) => {
             customerOnSubmitHandler(e, { name: customer.name, description: customer.description, labelId: searchParams.get("label") });
@@ -209,35 +211,37 @@ export default function Home() {
         </div>
       )} */}
 
-      <CreateCustomerForm labels={labels!} />
+        {/* <CreateCustomerForm labels={labels!} /> */}
 
-      {/* Render customer */}
-      <div className="flex flex-col gap-2 my-2">
-        {customers?.customers.map((customer) => {
-          return (
-            <div
-              className="flex gap-2 bg-white px-4 rounded-md py-2"
-              key={customer._id}
-            >
-              <Link
+        {/* Render customer */}
+        <div className="flex flex-col gap-2">
+          {customers?.customers.map((customer) => {
+            return (
+              <div
+                className="flex gap-2 bg-white px-4 rounded-md py-2 justify-between "
                 key={customer._id}
-                to={`/customer/${customer._id}`}
               >
-                <p>{customer.name}</p>
+                <Link
+                  key={customer._id}
+                  to={`/customer/${customer._id}`}
+                >
+                  <p>{customer.name}</p>
 
-                {/* <span>Move to</span> */}
-              </Link>
-              <span
-                onClick={() => {
-                  setSelectedCustomer(customer);
-                }}
-              >
-                ...
-              </span>
-            </div>
-          );
-        })}
+                  {/* <span>Move to</span> */}
+                </Link>
+                <span
+                  onClick={() => {
+                    setSelectedCustomer(customer);
+                  }}
+                  className="cursor-pointer"
+                >
+                  ...
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
