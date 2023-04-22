@@ -212,6 +212,8 @@ export default function Home() {
       <CreateCustomerForm labels={labels!} />
 
       {/* Render customer */}
+      {searchParams.get("label") ? <Link to={`/create/${searchParams.get("label")}`}>Create customer page</Link> : null}
+
       <div className="flex flex-col gap-2 my-2">
         {customers?.customers.map((customer) => {
           return (
