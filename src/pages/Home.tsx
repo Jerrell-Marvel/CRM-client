@@ -220,7 +220,7 @@ export default function Home() {
           {customers?.customers.map((customer) => {
             return (
               <div
-                className="flex gap-2 bg-white px-4 rounded-md py-2 justify-between "
+                className="flex gap-2 bg-white px-4 rounded-md py-2 justify-between"
                 key={customer._id}
               >
                 <Link
