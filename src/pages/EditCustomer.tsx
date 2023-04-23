@@ -76,10 +76,15 @@ export default function EditCustomer() {
             },
           });
         }}
-        className="p-4 rounded-md bg-white flex flex-col gap-4"
+        className="p-4 rounded-md bg-white flex flex-col gap-2"
       >
         <div className="flex flex-col">
-          <label htmlFor="name">Name</label>
+          <label
+            htmlFor="name"
+            className="font-medium"
+          >
+            Name
+          </label>
           <input
             type="text"
             value={customerData.name}
@@ -92,7 +97,12 @@ export default function EditCustomer() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="name">Description</label>
+          <label
+            htmlFor="name"
+            className="font-medium"
+          >
+            Description
+          </label>
           <input
             type="text"
             value={customerData.description}
@@ -108,7 +118,7 @@ export default function EditCustomer() {
             type="submit"
             className="btn w-fit"
           >
-            submit
+            Save
           </button>
         </div>
       </form>
